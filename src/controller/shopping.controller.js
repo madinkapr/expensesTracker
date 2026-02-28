@@ -6,6 +6,11 @@ import { ApiError } from '../utils/ApiError.js';
 class ShoppingController {
     async create(req, res) {
         try {
+            const { item } = req.body;
+            const existsItem = await Shopping.findOne({ item })
+            if (existsItem) {
+                throw new ApiError(409, 'Item already exists')
+            }
             const newShopping = await Shopping.create(req.body);
             return successRes(res, newShopping, 201)
         } catch (error) {
@@ -38,6 +43,13 @@ class ShoppingController {
     async update(req, res) {
         try {
             const id = req.params.id;
+            const { item } = req.body;
+            if (item) {
+                const existsItem = await Shopping.findOne({ item });
+                if (existsItem && existsItem.id !== id) {
+                    throw new ApiError(409, 'Item already exists')
+                }
+            }
             const updatedShopping = await Shopping.findByIdAndUpdate(id, req.body, { new: true })
             return successRes(res, updatedShopping)
         } catch (error) {
@@ -48,6 +60,13 @@ class ShoppingController {
     async updateAll(req, res) {
         try {
             const id = req.params.id;
+            const { item } = req.body;
+            if (item) {
+                const existsItem = await Shopping.findOne({ item });
+                if (existsItem && existsItem.id !== id) {
+                    throw new ApiError(409, 'Item already exists')
+                }
+            }
             const updatedShopping = await Shopping.findOneAndReplace({ _id: id }, req.body, { new: true })//yoki Shopping.findByIdAndUpdate(id,req.body,{ new: true, overwrite: true } )
             return successRes(res, updatedShopping)
         } catch (error) {
@@ -56,11 +75,11 @@ class ShoppingController {
         }
     }
 
-    async remove(req,res){
+    async remove(req, res) {
         try {
             const id = req.params.id;
             await Shopping.findByIdAndDelete(id);
-            return successRes(res,{})
+            return successRes(res, {})
         } catch (error) {
             return errorRes(res, error)
         }

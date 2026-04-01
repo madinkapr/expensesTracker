@@ -1,2 +1,6 @@
-node_modules 
+node_modules/
 .env
+.qwen/
+__pycache__/
+*.pyc
+venv/

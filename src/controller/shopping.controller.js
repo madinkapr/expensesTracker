@@ -1,4 +1,4 @@
-import Shopping from '../schema/shopping.schema.js';
+import Shopping from '../schema/transaction.schema.js';
 import { errorRes } from '../utils/error-response.js';
 import { successRes } from '../utils/success-response.js';
 import { ApiError } from '../utils/ApiError.js';

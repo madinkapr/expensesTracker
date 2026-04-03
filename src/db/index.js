@@ -1,14 +1,11 @@
 import { connect } from 'mongoose';
-import { config } from 'dotenv';
 
-
-config();
-
-export async function connectDB() {
+export async function connectDB(uri) {
     try {
-        await connect(process.env.MONGO_URI);
+        await connect(uri);
         console.log('Connected database!');
     } catch (error) {
-        console.log('Error connecting to the database', error);
+        console.log('Error connecting to the database', error.message);
+        process.exit(1);
     }
 }

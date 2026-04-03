@@ -11,7 +11,7 @@ const app = express();
 
 app.use(express.json());
 
-await connectDB();
+await connectDB(process.env.MONGO_URI);
 
 app.use('/api', router)
 

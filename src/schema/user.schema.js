@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const userSchema = new Schema({
     name: { 
@@ -26,5 +27,10 @@ const userSchema = new Schema({
     versionKey: false,
     timestamps: true
 });
+
+// INSTANCE METHODLAR
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.passwordHash);
+};
 
 export default model('User', userSchema);

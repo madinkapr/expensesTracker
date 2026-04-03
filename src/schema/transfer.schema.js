@@ -32,4 +32,8 @@ const transferSchema = new Schema({
     timestamps: true
 })
 
+// INDEXLAR
+transferSchema.index({ userId: 1 });
+transferSchema.index({ userId: 1, date: -1 });
+
 export default model('Transfer', transferSchema)

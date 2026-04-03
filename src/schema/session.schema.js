@@ -22,4 +22,14 @@ const sessionSchema = new Schema({
     timestamps: true
 })
 
+// INSTANCE METHODLAR
+sessionSchema.methods.isExpired = function() {
+    return new Date() > this.expiresAt;
+};
+
+// INDEXLAR
+sessionSchema.index({ userId: 1 });
+sessionSchema.index({ refreshToken: 1 });
+sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
 export default model('Session', sessionSchema)

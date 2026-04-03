@@ -6,28 +6,31 @@ const categorySchema = new Schema({
         ref: 'User',
         required: true
     },
-    name: { 
-        type: String, 
-        required: true 
+    name: {
+        type: String,
+        required: true
     },
     color: {
         type: String
     },
-    icon : {
+    icon: {
         type: String
-    }, 
+    },
     type: {
         type: String,
         enum: ['expense', 'income'],
         required: true
     },
     isDefault: {
-        type: Boolean, 
+        type: Boolean,
         default: false
     }
 }, {
     versionKey: false,
     timestamps: true
 })
+
+// INDEXLAR
+categorySchema.index({ userId: 1, type: 1 })
 
 export default model('Category', categorySchema)

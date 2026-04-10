@@ -64,7 +64,7 @@ budgetSchema.methods.isOverBudget = function() {
 budgetSchema.statics.getCurrentBudget = async function(userId) {
     const now = new Date();
     return this.findOne({
-        userId,
+        userId:userId,
         month: now.getMonth() + 1,
         year: now.getFullYear()
     });

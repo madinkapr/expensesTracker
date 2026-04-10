@@ -1,15 +1,21 @@
 import {Router} from 'express';
-import shoppingRouter from './shopping.route.js';
-import shoppingCategory from './shoppingCategory.route.js';
 import authRouter from './auth.route.js';
 import transactionRouter from './transaction.route.js';
+import accountRouter from './account.route.js';
+import categoryRouter from './category.route.js';
+import transferRouter from './transfer.route.js';
+import budgetRouter from './budget.route.js';
+import reportRouter from './report.route.js';
 
 const router = Router();
 
 router
     .use('/auth', authRouter)
     .use('/transactions', transactionRouter)
-    .use('/shopping', shoppingRouter)
-    .use('/category', shoppingCategory)
+    .use('/accounts', accountRouter)
+    .use('/categories', categoryRouter)
+    .use('/transfers', transferRouter)
+    .use('/budgets', budgetRouter)
+    .use('/reports', reportRouter)
 
 export default router;

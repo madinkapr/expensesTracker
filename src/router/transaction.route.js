@@ -8,6 +8,7 @@ const router = Router();
 router
     .post('/', verifyToken, transactionController.create)
     .get('/', verifyToken, transactionController.getAll)
+    .get('/:id', verifyToken, transactionController.getOne)
     .patch('/:id', verifyToken, transactionController.update)
     .delete('/:id', verifyToken, transactionController.delete)
 

@@ -10,6 +10,8 @@ router
     .post('/register', authController.register)
     .post('/login', authController.login)
     .post('/logout', verifyToken, authController.logout)
+    .post('/forget-password', authController.forgetPassword)
+    .post('/reset-password/:token', authController.resetPassword)
 
 
 // Protected route (Himoyalangan - TZ bo'yicha)

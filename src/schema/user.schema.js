@@ -22,6 +22,12 @@ const userSchema = new Schema({
         required: true,
         default: 'UZS',
         enum: ['UZS', 'USD', 'KRW', 'EUR']
+    },
+    resetPasswordToken: {
+        type:String
+    },
+    resetPasswordExpires: {
+        type: Date
     }
 }, {
     versionKey: false,

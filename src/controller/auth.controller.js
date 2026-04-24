@@ -1,14 +1,17 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
+import Session from '../schema/session.schema.js';
 import User from '../schema/user.schema.js';
 import { successRes } from '../utils/success-response.js';
-import {errorRes} from '../utils/error-response.js';
+import { errorRes } from '../utils/error-response.js';
+import { sendEmail } from '../utils/send-email.js';
 
 class authController {
-    async register(req,res){
+    async register(req, res) {
         try {
-            const {name, email, password} = req.body;
+            const { name, email, password } = req.body;
 
             // 1. Parolni shifrlash
             const salt = await bcrypt.genSalt(10);
@@ -35,17 +38,17 @@ class authController {
         }
     }
 
-    async login(req,res){
+    async login(req, res) {
         try {
-            const {email, password} = req.body;
+            const { email, password } = req.body;
 
-             // 1. Foydalanuvchini topish
-             const user = await User.findOne({email});
-             if(!user){
+            // 1. Foydalanuvchini topish
+            const user = await User.findOne({ email });
+            if (!user) {
                 return errorRes(res, { statusCode: 404, message: "User not found" })
-             }
+            }
 
-             // 2. Parolni tekshirish
+            // 2. Parolni tekshirish
             const isMatch = await bcrypt.compare(password, user.passwordHash);
             if (!isMatch) {
                 return errorRes(res, { statusCode: 401, message: "Invalid password" });
@@ -53,27 +56,120 @@ class authController {
 
             // 3. Token yaratish (JWT)
             const token = jwt.sign(
-                { id: user._id }, 
-                process.env.JWT_SECRET, 
+                { id: user._id },
+                process.env.JWT_SECRET,
                 { expiresIn: '1d' } // 1 kun amal qiladi
             );
 
+            // 4. Refresh token yasash va Sessiyani bazaga saqlash
+            const refreshToken = crypto.randomBytes(40).toString('hex');
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 7); // 7 kunga yaroqli
+
+            const userAgent = req.headers['user-agent'] || 'Unknown';
+
+            await Session.create({
+                userId: user._id,
+                refreshToken,
+                userAgent,
+                expiresAt
+            });
+
+            // 5. Javob qaytarish (javobga refreshToken ni ham qo'shib yuboramiz)
             return successRes(res, {
                 token,
-                user: {id:user._id, name:user.name, email: user.email}
-            })
+                refreshToken,
+                user: { id: user._id, name: user.name, email: user.email }
+            });
         } catch (error) {
             return errorRes(res, error)
         }
     }
 
-    async logout(req,res){
+    async logout(req, res) {
         try {
-            // Kelajakda shu yerda Session kolleksiyasidan 
-            // foydalanuvchining tokenini o'chiramiz.
-            // Hozircha shunchaki muvaffaqiyatli javob qaytaramiz.
-            
-            return successRes(res, { message: "Tizimdan chiqildi" });
+            const { refreshToken } = req.body;
+
+            if (!refreshToken) {
+                return errorRes(res, { statusCode: 400, message: "Refresh token is required" });
+            }
+
+            const deleteSession = await Session.findOneAndDelete({ refreshToken });
+
+            if (!deleteSession) {
+                return errorRes(res, { statusCode: 404, message: "Session not found" });
+            }
+            return successRes(res, { message: "Logged out successfully" });
+        } catch (error) {
+            return errorRes(res, error);
+        }
+    }
+    async forgetPassword(req, res) {
+        try {
+            const { email } = req.body;
+
+            // 1. Foydalanuvchini email orqali topish
+            const user = await User.findOne({ email });
+            if (!user) {
+                return errorRes(res, { statusCode: 404, message: "User not found" })
+            }
+
+            // 2. Vaqtinchalik token yaratish (crypto orqali)
+            const resetToken = crypto.randomBytes(20).toString('hex');
+
+            // 3. Token va uning amal qilish muddatini (masalan 15 daqiqa) bazaga saqlash
+            user.resetPasswordToken = resetToken;
+            user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 daqiqa
+            await user.save();
+
+            // 4. Reset linkni emailga yuborish
+            const resetPasswordUrl = `http://localhost:3000/reset-password/${resetToken}`;
+            const message = `
+                <h1>ExpenseWise Password Reset</h1>
+                <p>Click the link below to reset your password:</p>
+                <a href="${resetPasswordUrl}">Reset Password</a>
+                <p>This link will expire in 15 minutes.</p>
+            `;
+
+            await sendEmail({
+                email,
+                subject: 'ExpenseWise Password Reset',
+                message
+            });
+
+            return successRes(res, { message: 'Password reset link sent to your email' });
+        } catch (error) {
+            return errorRes(res, error);
+        }
+    }
+
+    async resetPassword(req, res) {
+        try {
+            // URL dan (parametr orqali) tokenni olamiz, 
+            // Body dan esa yangi parolni olamiz
+            const { token } = req.params;
+            const { newPassword } = req.body;
+            // 1. Bazadan shunday tokeni bor va vaqti o'tmagan yuzerni qidiramiz
+            const user = await User.findOne({
+                resetPasswordToken: token,
+                resetPasswordExpires: { $gt: Date.now() }
+            });
+
+            if (!user) {
+                return errorRes(res, { statusCode: 400, message: "Invalid or expired token" });
+            }
+
+            // 2. Yangi parolni shifrlaymiz (hash)
+            const salt = await bcrypt.genSalt(10);
+            user.passwordHash = await bcrypt.hash(newPassword, salt);
+
+            // 3. Tokenni olib tashlaymiz (tokenni faqat 1 marta ishlatish mumkin)
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+            await user.save();
+
+            // 4. success javob qaytarish
+            return successRes(res, { message: "Password reset successfully" });
         } catch (error) {
             return errorRes(res, error);
         }

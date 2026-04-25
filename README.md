@@ -2,6 +2,27 @@
 
 ExpenseWise — bu shaxsiy xarajatlarni kuzatib borish, moliyaviy maqsadlarni belgilash va oylik hisobotlarni tahlil qilish uchun mo'ljallangan zamonaviy web-ilova.
 
+## 📸 Skrinshotlar
+
+<div align="center">
+  <p><b>Asosiy sahifa (Landing)</b></p>
+  <img src="screenshots/landing.png" width="90%" alt="Landing Page" />
+  <br><br>
+  <p><b>Interaktiv Dashboard</b></p>
+  <img src="screenshots/dashboard.png" width="90%" alt="Dashboard" />
+  <br><br>
+  <div style="display: flex; justify-content: space-around;">
+    <div style="width: 48%;">
+      <p><b>Xarajatlar ro'yxati</b></p>
+      <img src="screenshots/expenses.png" width="100%" alt="Expenses" />
+    </div>
+    <div style="width: 48%;">
+      <p><b>Xarajat qo'shish</b></p>
+      <img src="screenshots/add-expense.png" width="100%" alt="Add Expense" />
+    </div>
+  </div>
+</div>
+
 ## ✨ Imkoniyatlar
 
 - 🔐 **To'liq Autentifikatsiya**: Ro'yxatdan o'tish, tizimga kirish va parolni email orqali tiklash.

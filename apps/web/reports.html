@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hisobotlar</title>
+    <link rel="stylesheet" href="/src/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+    <div class="sidebar-overlay"></div>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">ExpenseWise</div>
+        <nav class="side-nav">
+            <a href="/dashboard.html">📊 Umumiy</a>
+            <a href="/expenses.html">💸 Xarajatlar</a>
+            <a href="/reports.html" class="active">📈 Hisobotlar</a>
+            <a href="/settings.html">⚙️ Sozlamalar</a>
+        </nav>
+        <button id="logout-btn" class="btn-logout">Chiqish</button>
+    </aside>
+
+    <main class="main-content">
+        <header class="dashboard-header">
+            <div class="header-left">
+                <button id="menu-toggle" class="btn-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="welcome">
+                    <h1>Moliyaviy Hisobotlar</h1>
+                    <p>Xarajatlaringizning chuqur tahlili</p>
+                </div>
+            </div>
+            <div class="user-profile">
+                <button id="theme-toggle" class="btn-theme"></button>
+                <a href="/settings.html" title="Sozlamalar">
+                    <div class="avatar">👤</div>
+                </a>
+            </div>
+        </header>
+
+        <!-- Kichik Statistikalar -->
+        <div class="card-grid">
+            <div class="card stat-card">
+                <h3>Ushbu oydagi jami sarf</h3>
+                <div id="report-monthly-total" class="stat-value">0 UZS</div>
+            </div>
+            <div class="card stat-card">
+                <h3>Eng ko'p sarflangan kategoriya</h3>
+                <div id="report-top-category" class="stat-value">-</div>
+            </div>
+            <div class="card stat-card">
+                <h3>O'rtacha kunlik xarajat</h3>
+                <div id="report-daily-average" class="stat-value">0 UZS</div>
+            </div>
+        </div>
+
+        <!-- Kattaroq Grafiklar -->
+        <div class="reports-grid">
+            <div class="card chart-card">
+                <h3>Kunlik xarajatlar dinamikasi (Oxirgi 30 kun)</h3>
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="dailyStatsChart"></canvas>
+                </div>
+            </div>
+            <div class="card chart-card">
+                <h3>Kategoriyalar bo'yicha ulush</h3>
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="categoryDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eng qimmat xarajatlar -->
+        <section class="card" style="margin-top: 30px;">
+            <h3>Eng qimmat xarajatlar</h3>
+            <div class="table-responsive">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Sana</th>
+                            <th>Kategoriya</th>
+                            <th>Izoh</th>
+                            <th>Miqdor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-expenses-tbody">
+                        <!-- JS orqali to'ldiriladi -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="/src/main.js" type="module"></script>
+    <script src="/src/reports.js" type="module"></script>
+</body>
+</html>

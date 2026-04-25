@@ -1,4 +1,5 @@
 import Transaction from "../schema/transaction.schema.js";
+import Account from "../schema/account.schema.js";
 import { successRes } from "../utils/success-response.js";
 import { errorRes } from "../utils/error-response.js";
 import { checkEntity } from "../utils/check-entity.js";
@@ -8,18 +9,36 @@ class TransactionController {
         try {
             const { type, date, accountId, categoryId, description, tags, amount, note, cleared } = req.body;
 
+            let finalAccountId = accountId;
+
+            // Agar accountId berilmagan bo'lsa, avtomatik biriktiramiz
+            if (!finalAccountId) {
+                let account = await Account.findOne({ userId: req.userId });
+                if (!account) {
+                    // Agar umuman hisobi bo'lmasa, yangi yaratamiz
+                    account = new Account({
+                        userId: req.userId,
+                        name: 'Asosiy hamyon',
+                        type: 'cash',
+                        initialBalance: 0,
+                        currentBalance: 0
+                    });
+                    await account.save();
+                }
+                finalAccountId = account._id;
+            }
+
             const newTransaction = new Transaction({
-                userId: req.userId, //Middleware dan olinadi!
+                userId: req.userId, 
                 type,
                 date,
-                accountId,
+                accountId: finalAccountId,
                 categoryId,
                 description,
                 tags,
                 amount,
                 note,
                 cleared: cleared || false
-
             });
 
             await newTransaction.save();

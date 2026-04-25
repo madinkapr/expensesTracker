@@ -27,7 +27,27 @@ class CategoryController {
     
         async getAll(req, res) {
             try {
-                const categories = await Category.find({ userId: req.userId }).sort({ createdAt: -1 });
+                // Foydalanuvchining o'z kategoriyalari + Standart kategoriyalar
+                let categories = await Category.find({ 
+                    $or: [
+                        { userId: req.userId },
+                        { isDefault: true }
+                    ]
+                }).sort({ isDefault: -1, createdAt: -1 });
+
+                // Agar hali hech narsa bo'lmasa, birinchi marta kirgan yuzer uchun seed qilish
+                if (categories.length === 0) {
+                    const defaults = [
+                        { name: 'Oziq-ovqat', icon: '🍔', color: '#F44336', isDefault: true, type: 'expense' },
+                        { name: 'Transport', icon: '🚗', color: '#2196F3', isDefault: true, type: 'expense' },
+                        { name: 'Ijara', icon: '🏠', color: '#9C27B0', isDefault: true, type: 'expense' },
+                        { name: 'Ko\'ngilochar', icon: '🎬', color: '#FFEB3B', isDefault: true, type: 'expense' },
+                        { name: 'Maosh', icon: '💰', color: '#4CAF50', isDefault: true, type: 'income' },
+                        { name: 'Boshqa', icon: '📦', color: '#9E9E9E', isDefault: true, type: 'expense' }
+                    ];
+                    await Category.insertMany(defaults);
+                    categories = await Category.find({ isDefault: true });
+                }
     
                 return successRes(res, categories)
             } catch (error) {

@@ -123,7 +123,7 @@ class authController {
             await user.save();
 
             // 4. Reset linkni emailga yuborish
-            const resetPasswordUrl = `http://localhost:3000/reset-password/${resetToken}`;
+            const resetPasswordUrl = `http://localhost:5173/reset-password.html?token=${resetToken}`;
             const message = `
                 <h1>ExpenseWise Password Reset</h1>
                 <p>Click the link below to reset your password:</p>

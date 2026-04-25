@@ -1,0 +1,743 @@
+/* Google Fonts dan Inter shriftini ulaymiz */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Asosiy ranglar (TZ bo'yicha) */
+  --primary-color: #1F8A70;
+  /* Teal Green */
+  --primary-hover: #166b56;
+  /* To'qroq Teal Green */
+  --secondary-color: #1F3A5F;
+  /* Deep Blue */
+  --bg-color: #F7FAFC;
+  /* Light Gray */
+  --text-dark: #1F2937;
+  /* Dark Slate */
+  --text-muted: #5B7083;
+  /* Muted Blue Gray */
+
+  /* Boshqa yordamchi ranglar */
+  --white: #ffffff;
+  --danger: #ef4444;
+  --success: #10b981;
+  --border-color: #e5e7eb;
+
+  /* O'lchamlar va shakllar */
+  --radius-card: 16px;
+  --radius-btn: 12px;
+  --spacing: 24px;
+}
+
+/* ================================
+   DARK MODE RANG LUG'ATI
+   ================================ */
+[data-theme="dark"] {
+  --bg-color: #0f172a;
+  /* To'q ko'k/qora fon */
+  --text-dark: #f8fafc;
+  /* Oq yozuv */
+  --text-muted: #94a3b8;
+  /* Kulrang yozuv */
+  --white: #1e293b;
+  /* Dark rejimdagi "Oq" aslida to'q kulrang bo'ladi (Kardlar uchun) */
+  --border-color: #334155;
+  --secondary-color: #38bdf8;
+  /* Dark mode'da ikkinchi rang ochroq ko'k */
+}
+
+/* Dark mode da Navbar xiralashishi (glass) ga qoramtir rang beramiz */
+[data-theme="dark"] .navbar {
+  background: rgba(15, 23, 42, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Dark mode da orqa fon gradientini moslashtirish */
+[data-theme="dark"] .hero {
+  background: radial-gradient(circle at 50% -20%, rgba(31, 138, 112, 0.2), var(--bg-color) 70%);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Kichik chiroyli scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 10px;
+}
+
+/* ================================
+   TUGMALAR (BUTTONS) - Premium
+   ================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: var(--radius-btn);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--white);
+  box-shadow: 0 4px 14px 0 rgba(31, 138, 112, 0.39);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 6px 20px rgba(31, 138, 112, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--text-dark);
+  border-color: var(--border-color);
+}
+
+.btn-outline:hover {
+  border-color: var(--text-dark);
+  color: var(--text-dark);
+  background-color: rgba(31, 41, 55, 0.05);
+  transform: translateY(-2px);
+}
+
+.btn-large {
+  padding: 16px 36px;
+  font-size: 18px;
+  border-radius: 16px;
+}
+
+.btn-theme {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dark);
+  font-size: 22px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.btn-theme:hover {
+  background: rgba(31, 138, 112, 0.1);
+  transform: rotate(15deg);
+}
+
+/* ================================
+   NAVBAR (Tepa menyu) - Glassmorphism
+   ================================ */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 5%;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  /* Orqa fonni xiralashtirish */
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.navbar .logo {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--secondary-color);
+  letter-spacing: -0.5px;
+  cursor: pointer;
+}
+
+/* "Wise" so'zini yashil qilish */
+.navbar .logo::after {
+  content: '.';
+  color: var(--primary-color);
+}
+
+.nav-links {
+  display: flex;
+  gap: 16px;
+}
+
+/* ================================
+   HERO SECTION (Asosiy ekran)
+   ================================ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5%;
+  background: radial-gradient(circle at 50% -20%, rgba(31, 138, 112, 0.15), var(--bg-color) 70%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Orqa fondagi bezak shakllar */
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(135deg, rgba(31, 138, 112, 0.2), rgba(31, 58, 95, 0.1));
+  border-radius: 50%;
+  filter: blur(80px);
+  top: -100px;
+  right: -100px;
+  z-index: 0;
+  animation: float 8s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(30px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.hero-content {
+  max-width: 800px;
+  text-align: center;
+  z-index: 1;
+  /* Yozuvlar orqa fon bezagining ustida turishi uchun */
+  animation: fadeIn 1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero h1 {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--secondary-color);
+  margin-bottom: 24px;
+  letter-spacing: -2px;
+}
+
+/* Sarlavhaga gradient effekt */
+.hero h1 {
+  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  font-size: 20px;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.7;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* ================================
+   RESPONSIVE (Mobil telefonlar uchun)
+   ================================ */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 42px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  .navbar {
+    padding: 16px 20px;
+  }
+}
+
+/* ================================
+   AUTH (Login / Register) FORMLARI
+   ================================ */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: var(--bg-color);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Orqa fonda aylanib yuruvchi rangli "blobs" (Faqat Login/Register uchun) */
+.auth-page::before,
+.auth-page::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  animation: pulseBlob 10s infinite alternate ease-in-out;
+}
+
+.auth-page::before {
+  width: 400px; height: 400px;
+  background: rgba(31, 138, 112, 0.4); /* Teal Green yorug'ligi */
+  top: -100px; left: -100px;
+}
+
+.auth-page::after {
+  width: 300px; height: 300px;
+  background: rgba(56, 189, 248, 0.3); /* Ochiq ko'k yorug'lik */
+  bottom: -50px; right: -50px;
+  animation-delay: -5s;
+}
+
+[data-theme="dark"] .auth-page::before { background: rgba(31, 138, 112, 0.2); }
+[data-theme="dark"] .auth-page::after { background: rgba(56, 189, 248, 0.15); }
+
+@keyframes pulseBlob {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.2) translate(40px, 40px); }
+}
+
+/* Muzlatilgan oyna (Glassmorphism) effekti */
+.auth-container {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 40px;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 1; /* Bloblarning ustida turishi kerak */
+  position: relative;
+}
+
+[data-theme="dark"] .auth-container {
+  background: rgba(30, 41, 59, 0.6); /* To'q ko'k shaffof fon */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--secondary-color);
+  margin-bottom: 8px;
+}
+
+.auth-header p {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text-dark);
+  background-color: transparent;
+  transition: all 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(31, 138, 112, 0.1);
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.auth-footer a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.auth-footer a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* ================================
+   DASHBOARD LAYOUT
+   ================================ */
+.dashboard-page {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: var(--white);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+  position: fixed;
+  height: 100vh;
+  z-index: 100;
+}
+
+[data-theme="dark"] .sidebar {
+  background: #1e1e1e;
+}
+
+.sidebar .logo {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 40px;
+  padding-left: 10px;
+}
+
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.side-nav a {
+  text-decoration: none;
+  color: var(--text-dark);
+  padding: 12px 15px;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.side-nav a:hover, .side-nav a.active {
+  background-color: rgba(31, 138, 112, 0.1);
+  color: var(--primary-color);
+}
+
+.btn-logout {
+  margin-top: auto;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-logout:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Main Content area */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 30px 5%;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+  font-size: 28px;
+  color: var(--text-dark);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+}
+
+/* Cards & Stats */
+.card {
+  background: var(--white);
+  padding: 24px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.card h3 {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.recent-activity {
+  min-height: 200px;
+}
+
+/* Responsive Dashboard */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 80px;
+    padding: 20px 10px;
+  }
+  .sidebar .logo, .side-nav a span {
+    display: none;
+  }
+  .main-content {
+    margin-left: 80px;
+  }
+}
+
+/* ================================
+   MODAL (Oyna) Dizayni
+   ================================ */
+.modal {
+  display: none; /* Odatiy holatda yopiq */
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background-color: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: modalIn 0.3s ease-out;
+  border: 1px solid var(--border-color);
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.modal-header h2 {
+  font-size: 22px;
+  color: var(--text-dark);
+}
+
+.close-modal {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.close-modal:hover {
+  color: var(--danger);
+}
+
+/* Form elementlari modal ichida */
+.modal .form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  background-color: var(--white);
+  color: var(--text-dark);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235B7083' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+[data-theme="dark"] .modal .form-group select {
+  background-color: #1e293b;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  opacity: 1;
+  height: 24px;
+  cursor: pointer;
+}
+
+.transaction-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.t-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.t-category-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(31, 138, 112, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.t-desc {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.t-date {
+    color: var(--text-muted);
+}
+
+.t-amount {
+    font-weight: 700;
+    color: var(--danger);
+}

@@ -1,22 +1,10 @@
 {
-  "name": "project_bro_mongoose",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "nodemon src/main.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "name": "expenses-tracker",
+  "private": true,
   "type": "module",
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.2.1",
-    "nodemailer": "^8.0.6",
-    "nodemon": "^3.1.11"
+  "scripts": {
+    "dev": "pnpm --parallel run dev",
+    "dev:api": "pnpm --filter @expenses-tracker/api dev",
+    "dev:web": "pnpm --filter @expenses-tracker/web dev"
   }
 }

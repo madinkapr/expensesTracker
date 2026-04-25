@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ro'yxatdan o'tish</title>
+</head>
+<body class="auth-page">
+    
+    <div class="auth-container">
+        <div class="auth-header">
+            <h2>Ro'yxatdan o'tish 🚀</h2>
+            <p>O'z xarajatlaringizni boshqarishni hoziroq boshlang</p>
+        </div>
+
+        <form id="register-form">
+            <div class="form-group">
+                <label for="name">To'liq ismingiz</label>
+                <input type="text" id="name" placeholder="Masalan: Ali Valiyev" required autocomplete="name">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email manzil</label>
+                <input type="email" id="email" placeholder="Sizning emailingiz..." required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Parol</label>
+                <input type="password" id="password" placeholder="Kamida 6 ta belgi..." required autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Ro'yxatdan o'tish</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Allaqachon hisobingiz bormi? <a href="/login.html">Kirish</a></p>
+        </div>
+    </div>
+
+    <!-- main.js ulanadi (CSS va Dark Mode uchun) -->
+    <script src="/src/main.js" type="module"></script>
+</body>
+</html>

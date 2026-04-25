@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirish</title>
+</head>
+<body class="auth-page">
+    
+    <div class="auth-container">
+        <div class="auth-header">
+            <h2>Xush kelibsiz! 👋</h2>
+            <p>Ilovaga kirish uchun ma'lumotlaringizni kiriting</p>
+        </div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email manzil</label>
+                <input type="email" id="email" placeholder="Sizning emailingiz..." required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Parol</label>
+                <input type="password" id="password" placeholder="Parolingizni kiriting..." required autocomplete="current-password">
+            </div>
+
+            <!-- Hozircha oddiy tugma, keyin JS ulaymiz -->
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Tizimga kirish</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Hali hisobingiz yo'qmi? <a href="/register.html">Ro'yxatdan o'tish</a></p>
+            <p style="margin-top: 10px;"><a href="#">Parolni unutdingizmi?</a></p>
+        </div>
+    </div>
+
+    <!-- main.js ulanadi (CSS va Dark Mode uchun) -->
+    <script src="/src/main.js" type="module"></script>
+</body>
+</html>

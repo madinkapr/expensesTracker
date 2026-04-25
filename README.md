@@ -5,20 +5,52 @@ ExpenseWise — bu shaxsiy xarajatlarni kuzatib borish, moliyaviy maqsadlarni be
 ## 📸 Skrinshotlar
 
 <div align="center">
-  <p><b>Asosiy sahifa (Landing)</b></p>
-  <img src="screenshots/landing.png" width="90%" alt="Landing Page" />
+  <p><b>Asosiy sahifa (Landing Page)</b></p>
+  <img src="screenshots/landing.png" width="90%" />
   <br><br>
-  <p><b>Interaktiv Dashboard</b></p>
-  <img src="screenshots/dashboard.png" width="90%" alt="Dashboard" />
+  <p><b>Interaktiv Dashboard (Dark & Light Mode)</b></p>
+  <div style="display: flex; justify-content: space-around;">
+    <img src="screenshots/dashboard.png" width="48%" />
+    <img src="screenshots/dashboard-light.png" width="48%" />
+  </div>
+  <br><br>
+  <p><b>Moliyaviy Hisobotlar va Analitika</b></p>
+  <img src="screenshots/reports.png" width="90%" />
+  <br><br>
+  <div style="display: flex; justify-content: space-around;">
+    <div style="width: 31%;">
+      <p><b>Xarajatlar ro'yxati</b></p>
+      <img src="screenshots/expenses.png" width="100%" />
+    </div>
+    <div style="width: 31%;">
+      <p><b>Xarajat qo'shish</b></p>
+      <img src="screenshots/add-expense.png" width="100%" />
+    </div>
+    <div style="width: 31%;">
+      <p><b>Sozlamalar</b></p>
+      <img src="screenshots/settings.png" width="100%" />
+    </div>
+  </div>
   <br><br>
   <div style="display: flex; justify-content: space-around;">
     <div style="width: 48%;">
-      <p><b>Xarajatlar ro'yxati</b></p>
-      <img src="screenshots/expenses.png" width="100%" alt="Expenses" />
+      <p><b>Ro'yxatdan o'tish</b></p>
+      <img src="screenshots/register.png" width="100%" />
     </div>
     <div style="width: 48%;">
-      <p><b>Xarajat qo'shish</b></p>
-      <img src="screenshots/add-expense.png" width="100%" alt="Add Expense" />
+      <p><b>Parolni tiklash</b></p>
+      <img src="screenshots/forgot-password.png" width="100%" />
+    </div>
+  </div>
+  <br><br>
+  <div style="display: flex; justify-content: space-around;">
+    <div style="width: 48%;">
+      <p><b>Tizimga kirish (Login)</b></p>
+      <img src="screenshots/login.png" width="100%" />
+    </div>
+    <div style="width: 48%;">
+      <p><b>Yangi parol o'rnatish</b></p>
+      <img src="screenshots/reset-password.png" width="100%" />
     </div>
   </div>
 </div>

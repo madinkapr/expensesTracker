@@ -8,11 +8,14 @@ ExpenseWise — bu shaxsiy xarajatlarni kuzatib borish, moliyaviy maqsadlarni be
   <p><b>Asosiy sahifa (Landing Page)</b></p>
   <img src="screenshots/landing.png" width="90%" />
   <br><br>
-  <p><b>Interaktiv Dashboard (Dark & Light Mode)</b></p>
+  <p><b>Interaktiv Dashboard (To'liq va tungi ko'rinish)</b></p>
   <div style="display: flex; justify-content: space-around;">
     <img src="screenshots/dashboard.png" width="48%" />
-    <img src="screenshots/dashboard-light.png" width="48%" />
+    <img src="screenshots/dashboard-extra.png" width="48%" />
   </div>
+  <br><br>
+  <p><b>Dashboard (Yorug' rejim)</b></p>
+  <img src="screenshots/dashboard-light.png" width="90%" />
   <br><br>
   <p><b>Moliyaviy Hisobotlar va Analitika</b></p>
   <img src="screenshots/reports.png" width="90%" />

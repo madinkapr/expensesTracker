@@ -269,6 +269,7 @@ body {
 /* Sarlavhaga gradient effekt */
 .hero h1 {
   background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

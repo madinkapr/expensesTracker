@@ -1,5 +1,6 @@
 import './style.css'
 import './auth.js'
+import { loadAvatarForWholeApp } from './settings.js';
 
 // Dark mode sahifa yuklangunga qadar ham ishlashi uchun
 // (fon o'zgarmasligi uchun)
@@ -10,6 +11,8 @@ if (savedTheme === 'dark') {
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    loadAvatarForWholeApp();
+    
     // --- ROUTE GUARD ---
     const publicPages = ['/', '/index.html', '/login.html', '/register.html', '/forgot-password.html', '/reset-password.html'];
     const currentPage = window.location.pathname;

@@ -5,6 +5,14 @@ let tempAvatarName = null;
 let savedAvatarData = null;
 let avatarRemoved = false;
 
+function getUserIdFromToken() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return null;
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.id; // yoki payload.userId (token structure ga qarab)
+}
+
 const initAvatarControls = () => {
     const fileInput = document.getElementById('settings-avatar');
     const removeBtn = document.getElementById('avatar-remove');
@@ -46,7 +54,8 @@ async function loadUserData() {
             document.getElementById('settings-email').value = user.email;
         }
         loadStoredAvatar();
-        updatePageAvatar(localStorage.getItem('profileImage'));
+        const userId = getUserIdFromToken();
+        updatePageAvatar(localStorage.getItem(`profileImage_${userId}`));
     } catch (error) {
         console.error("User load error:", error);
     }
@@ -71,13 +80,20 @@ function updateAvatarFilename(name) {
 }
 
 function loadStoredAvatar() {
-    savedAvatarData = localStorage.getItem('profileImage');
-    const imageName = localStorage.getItem('profileImageName');
+    const userId = getUserIdFromToken();
+    const AVATAR_KEY = `profileImage_${userId}`;
+    const AVATAR_NAME_KEY = `profileImageName_${userId}`;
+
+    savedAvatarData = localStorage.getItem(AVATAR_KEY);
+    const imageName = localStorage.getItem(AVATAR_NAME_KEY);
+
     updateAvatarPreview(savedAvatarData);
     updateAvatarFilename(imageName || (savedAvatarData ? 'Tanlangan profil rasmi' : null));
+
     tempAvatarData = null;
     tempAvatarName = null;
     avatarRemoved = false;
+
     return savedAvatarData;
 }
 
@@ -180,7 +196,7 @@ async function updateProfile(e) {
     try {
         const res = await fetch(`${API_URL}/users/me`, {
             method: 'PATCH',
-            headers: { 
+            headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
@@ -199,18 +215,24 @@ async function updateProfile(e) {
 }
 
 async function applyAvatarChanges() {
+    const userId = getUserIdFromToken();
+    const AVATAR_KEY = `profileImage_${userId}`;
+    const AVATAR_NAME_KEY = `profileImageName_${userId}`;
+
     if (avatarRemoved) {
-        localStorage.removeItem('profileImage');
-        localStorage.removeItem('profileImageName');
+        localStorage.removeItem(AVATAR_KEY);
+        localStorage.removeItem(AVATAR_NAME_KEY);
         savedAvatarData = null;
         updatePageAvatar(null);
     }
+
     if (tempAvatarData) {
-        localStorage.setItem('profileImage', tempAvatarData);
-        localStorage.setItem('profileImageName', tempAvatarName);
+        localStorage.setItem(AVATAR_KEY, tempAvatarData);
+        localStorage.setItem(AVATAR_NAME_KEY, tempAvatarName);
         savedAvatarData = tempAvatarData;
         updatePageAvatar(savedAvatarData);
     }
+
     tempAvatarData = null;
     tempAvatarName = null;
     avatarRemoved = false;
@@ -232,7 +254,7 @@ async function updateBudget(e) {
             // Bor bo'lsa yangilash
             res = await fetch(`${API_URL}/budgets/${currentBudgetId}`, {
                 method: 'PATCH',
-                headers: { 
+                headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
@@ -242,7 +264,7 @@ async function updateBudget(e) {
             // Yo'q bo'lsa yaratish
             res = await fetch(`${API_URL}/budgets`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
@@ -274,7 +296,7 @@ async function updatePassword(e) {
     try {
         const res = await fetch(`${API_URL}/users/me`, {
             method: 'PATCH',
-            headers: { 
+            headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
@@ -290,4 +312,15 @@ async function updatePassword(e) {
     } catch (error) {
         console.error("Password update error:", error);
     }
+}
+
+export function loadAvatarForWholeApp() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const userId = payload.id;
+
+    const avatar = localStorage.getItem(`profileImage_${userId}`);
+    updatePageAvatar(avatar);
 }

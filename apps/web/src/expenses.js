@@ -33,7 +33,7 @@ async function loadCategories() {
 async function loadExpenses() {
     const token = localStorage.getItem('accessToken');
     const tbody = document.getElementById('expenses-tbody');
-    
+
     // Filtr qiymatlarini olish
     const categoryId = document.getElementById('filter-category').value;
     const dateFrom = document.getElementById('filter-date-from').value;
@@ -48,7 +48,11 @@ async function loadExpenses() {
 
         // --- FILTRLASH (Frontend qismida) ---
         if (categoryId !== 'all') {
-            transactions = transactions.filter(t => t.categoryId && t.categoryId._id === categoryId);
+            transactions = transactions.filter(t => {
+                if (!t.categoryId) return false;
+                // O'zining ID si yoki Parentining ID si mos kelsa
+                return t.categoryId._id === categoryId || (t.categoryId.parentId && t.categoryId.parentId._id === categoryId);
+            });
         }
         if (dateFrom) {
             transactions = transactions.filter(t => new Date(t.date) >= new Date(dateFrom));
@@ -67,14 +71,36 @@ async function loadExpenses() {
             return;
         }
 
-        transactions.reverse().forEach(t => {
+        transactions.forEach(t => {
             const date = new Date(t.date).toLocaleDateString('uz-UZ');
-            const categoryName = t.categoryId ? `${t.categoryId.icon} ${t.categoryId.name}` : 'Kategoriyasiz';
-            
+
+            // Kategoriya nomini chiroyli ko'rsatish (Asosiy > Sub)
+            let categoryHtml = '<span class="category-badge">Kategoriyasiz</span>';
+            if (t.categoryId) {
+                const hasParent = t.categoryId.parentId && typeof t.categoryId.parentId === 'object';
+                if (hasParent) {
+                    categoryHtml = `
+                        <div class="category-badge">
+                            <span>${t.categoryId.parentId.icon}</span>
+                            <span class="cat-parent-label">${t.categoryId.parentId.name}</span>
+                            <span class="cat-divider">/</span>
+                            <span class="cat-main-label">${t.categoryId.name}</span>
+                        </div>
+                    `;
+                } else {
+                    categoryHtml = `
+                        <div class="category-badge">
+                            <span>${t.categoryId.icon}</span>
+                            <span class="cat-main-label">${t.categoryId.name}</span>
+                        </div>
+                    `;
+                }
+            }
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${date}</td>
-                <td><span class="category-badge">${categoryName}</span></td>
+                <td>${categoryHtml}</td>
                 <td>${t.description}</td>
                 <td class="t-amount">-${t.amount.toLocaleString()} UZS</td>
                 <td>

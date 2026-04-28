@@ -34,6 +34,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const profileImage = localStorage.getItem('profileImage');
+    if (profileImage) {
+        const avatarEls = document.querySelectorAll('.avatar');
+        avatarEls.forEach(el => {
+            el.style.backgroundImage = `url('${profileImage}')`;
+            el.style.backgroundSize = 'cover';
+            el.style.backgroundPosition = 'center';
+            el.textContent = '';
+        });
+    }
+
     // --- DARK MODE ---
     const themeToggleBtn = document.getElementById('theme-toggle');
     const root = document.documentElement;

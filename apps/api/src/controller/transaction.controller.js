@@ -50,7 +50,12 @@ class TransactionController {
 
     async getAll(req, res) {
         try {
-            const transactions = await Transaction.find({ userId: req.userId }).populate('categoryId').sort({ date: -1 });
+            const transactions = await Transaction.find({ userId: req.userId })
+                .populate({
+                    path: 'categoryId',
+                    populate: { path: 'parentId' }
+                })
+                .sort({ date: -1 });
 
             return successRes(res, transactions)
         } catch (error) {

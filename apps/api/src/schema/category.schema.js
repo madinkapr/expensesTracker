@@ -21,6 +21,12 @@ const categorySchema = new Schema({
         enum: ['expense', 'income'],
         required: true
     },
+    parentId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
+        required: false,
+        default: null
+    },
     isDefault: {
         type: Boolean,
         default: false

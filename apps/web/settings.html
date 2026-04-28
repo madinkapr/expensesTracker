@@ -17,6 +17,7 @@
         <nav class="side-nav">
             <a href="/dashboard.html">📊 Umumiy</a>
             <a href="/expenses.html">💸 Xarajatlar</a>
+            <a href="/categories.html">🏷️ Kategoriyalar</a>
             <a href="/reports.html">📈 Hisobotlar</a>
             <a href="/settings.html" class="active">⚙️ Sozlamalar</a>
         </nav>
@@ -49,13 +50,25 @@
             <section class="card settings-card">
                 <h3>👤 Profil ma'lumotlari</h3>
                 <form id="profile-form">
-                    <div class="form-group">
+                        <div class="form-group">
                         <label>To'liq ismingiz</label>
                         <input type="text" id="settings-name" placeholder="Ismingizni kiriting">
                     </div>
                     <div class="form-group">
                         <label>Email manzilingiz</label>
                         <input type="email" id="settings-email" placeholder="Emailingizni kiriting">
+                    </div>
+                    <div class="form-group avatar-upload-group">
+                        <label>Profil rasmi</label>
+                        <div class="avatar-upload">
+                            <div id="avatar-preview" class="avatar-preview">📷</div>
+                            <div class="avatar-input-wrap">
+                                <label for="settings-avatar" class="file-button">Rasm tanlash</label>
+                                <span id="avatar-filename" class="avatar-filename">Hech rasm tanlanmadi</span>
+                                <button type="button" id="avatar-remove" class="btn btn-outline btn-small">Rasmni o'chirish</button>
+                                <input type="file" id="settings-avatar" accept="image/*">
+                            </div>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Saqlash</button>
                 </form>

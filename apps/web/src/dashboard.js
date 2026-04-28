@@ -4,13 +4,27 @@ const token = localStorage.getItem('accessToken');
 // Global Chart ob'ektlari
 let expenseChartObj = null;
 let weeklyChartObj = null;
+let dashboardTransactions = [];
+
+const getTextColor = () => document.documentElement.getAttribute('data-theme') === 'dark' ? 'white' : '#1f2937';
+
+const initDashboardThemeObserver = () => {
+    const observer = new MutationObserver(() => {
+        if (dashboardTransactions.length > 0) {
+            renderExpenseChart(dashboardTransactions);
+            renderWeeklyChart(dashboardTransactions);
+        }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
+    initDashboardThemeObserver();
     if (!token) {
         window.location.href = '/login.html';
         return;
     }
-    
+
     await setupDashboard();
     await loadDashboardData();
 });
@@ -41,9 +55,19 @@ async function setupDashboard() {
         });
         const catData = await catRes.json();
         if (catData.data && categorySelect) {
-            categorySelect.innerHTML = catData.data.map(c => 
-                `<option value="${c._id}">${c.icon} ${c.name}</option>`
-            ).join('');
+            const categories = catData.data;
+            const mainCats = categories.filter(c => !c.parentId);
+
+            let optionsHtml = '';
+            mainCats.forEach(main => {
+                optionsHtml += `<option value="${main._id}">${main.icon} ${main.name}</option>`;
+                const children = categories.filter(c => c.parentId === main._id);
+                children.forEach(child => {
+                    optionsHtml += `<option value="${child._id}">&nbsp;&nbsp;&nbsp;${child.icon} ${child.name}</option>`;
+                });
+            });
+
+            categorySelect.innerHTML = optionsHtml;
         }
     } catch (err) {
         console.error("Kategoriyalarni yuklashda xato:", err);
@@ -68,7 +92,7 @@ async function setupDashboard() {
             try {
                 const res = await fetch(`${API_URL}/transactions`, {
                     method: 'POST',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
@@ -136,6 +160,7 @@ async function loadDashboardData() {
         const currentBudget = budgets.find(b => b.month === (now.getMonth() + 1) && b.year === now.getFullYear());
 
         renderStats(transactions, currentBudget);
+        dashboardTransactions = transactions;
         renderRecentActivity(transactions);
         renderExpenseChart(transactions);
         renderWeeklyChart(transactions);
@@ -173,7 +198,7 @@ function renderStats(transactions, budget) {
         if (budget && budget.totalBudget > 0) {
             const limitAmount = budget.totalBudget;
             const remaining = limitAmount - monthly;
-            
+
             limitLabelEl.textContent = "Limitdan qoldi";
             limitValueEl.textContent = (remaining > 0 ? remaining.toLocaleString() : 0) + " UZS";
             limitValueEl.style.fontSize = "";
@@ -198,15 +223,36 @@ function renderRecentActivity(transactions) {
     }
 
     let html = `<h3>Oxirgi xarajatlar</h3><div class="transaction-list">`;
-    transactions.slice().reverse().slice(0, 5).forEach(t => {
-        const icon = t.categoryId?.icon || '💰';
-        const catName = t.categoryId?.name || 'Boshqa';
+    // Eng oxirgi 5 tasini ko'rsatish
+    transactions.slice(0, 5).forEach(t => {
+        let categoryHtml = '<span class="cat-main-label">Boshqa</span>';
+        let icon = '💰';
+        
+        if (t.categoryId) {
+            // Agar parentId bor bo'lsa (ya'ni bu sub-kategoriya bo'lsa)
+            const hasParent = t.categoryId.parentId && typeof t.categoryId.parentId === 'object';
+            icon = hasParent ? t.categoryId.parentId.icon : t.categoryId.icon;
+            
+            if (hasParent) {
+                categoryHtml = `
+                    <div class="category-badge" style="background: none; border: none; padding: 0; box-shadow: none;">
+                        <span class="cat-parent-label">${t.categoryId.parentId.name}</span>
+                        <span class="cat-divider">/</span>
+                        <span class="cat-main-label">${t.categoryId.name}</span>
+                    </div>
+                `;
+            } else {
+                categoryHtml = `<span class="cat-main-label">${t.categoryId.name}</span>`;
+            }
+        }
+
         html += `
             <div class="transaction-item">
                 <div class="t-info">
                     <span class="t-category-icon">${icon}</span>
                     <div>
-                        <p class="t-desc">${t.description} <small>(${catName})</small></p>
+                        <p class="t-desc">${t.description}</p>
+                        <div style="margin-top: 4px;">${categoryHtml}</div>
                         <small class="t-date">${new Date(t.date).toLocaleDateString()}</small>
                     </div>
                 </div>
@@ -225,26 +271,28 @@ function renderExpenseChart(transactions) {
 
     const categoryTotals = {};
     transactions.forEach(t => {
-        const catName = t.categoryId?.name || 'Boshqa';
+        // Sub-kategoriyalarni asosiy kategoriyaga guruhlash
+        const catName = (t.categoryId && t.categoryId.parentId) ? t.categoryId.parentId.name : (t.categoryId ? t.categoryId.name : 'Boshqa');
         categoryTotals[catName] = (categoryTotals[catName] || 0) + t.amount;
     });
 
     if (expenseChartObj) expenseChartObj.destroy();
 
+    const textColor = getTextColor();
     expenseChartObj = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: Object.keys(categoryTotals),
             datasets: [{
                 data: Object.values(categoryTotals),
-                backgroundColor: ['#1F8A70', '#38bdf8', '#fbbf24', '#f87171', '#a78bfa'],
+                backgroundColor: ['#1F8A70', '#38bdf8', '#fbbf24', '#f87171', '#a78bfa', '#ec4899', '#f97316'],
                 borderWidth: 0
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } },
+            plugins: { legend: { position: 'bottom', labels: { color: textColor } } },
             cutout: '70%'
         }
     });
@@ -274,6 +322,7 @@ function renderWeeklyChart(transactions) {
 
     if (weeklyChartObj) weeklyChartObj.destroy();
 
+    const textColor = getTextColor();
     weeklyChartObj = new Chart(ctx, {
         type: 'line',
         data: {
@@ -292,8 +341,8 @@ function renderWeeklyChart(transactions) {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, grid: { display: false } },
-                x: { grid: { display: false } }
+                y: { beginAtZero: true, grid: { display: false }, ticks: { color: textColor } },
+                x: { grid: { display: false }, ticks: { color: textColor } }
             }
         }
     });

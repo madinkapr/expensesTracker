@@ -7,14 +7,15 @@ import { checkEntity } from "../utils/check-entity.js";
 class CategoryController {
     async create(req, res) {
             try {
-                const { name, color, icon, type, isDefault } = req.body;
+                const { name, color, icon, type, parentId } = req.body;
     
                 const newCategory = new Category({
-                    userId: req.userId, //Middleware dan olinadi!
+                    userId: req.userId,
                     name,
                     color,
                     icon,
                     type,
+                    parentId: parentId || null,
                     isDefault: false    
                 });
     

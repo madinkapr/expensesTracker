@@ -1,4 +1,4 @@
-import './style.css'
+import '../style.css'
 import './auth.js'
 import { loadAvatarForWholeApp } from './settings.js';
 

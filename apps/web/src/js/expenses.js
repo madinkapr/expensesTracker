@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadCategories() {
     const token = localStorage.getItem('accessToken');
     const select = document.getElementById('filter-category');
+    const currentLang = localStorage.getItem('language') || 'uz';
 
     try {
         const res = await fetch(`${API_URL}/categories`, {
@@ -19,12 +20,17 @@ async function loadCategories() {
         const response = await res.json();
         const categories = response.data || [];
 
-        categories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat._id;
-            option.textContent = `${cat.icon} ${cat.name}`;
-            select.appendChild(option);
-        });
+        // Selectni tozalash va "Barchasi"ni qo'shish
+        if (select) {
+            select.innerHTML = `<option value="all" data-i18n="all_categories">${window.i18n.translations[currentLang].all_categories}</option>`;
+
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat._id;
+                option.textContent = `${cat.icon} ${window.i18n.getCategoryName(cat.name)}`;
+                select.appendChild(option);
+            });
+        }
     } catch (error) {
         console.error("Categories load error:", error);
     }
@@ -33,8 +39,9 @@ async function loadCategories() {
 async function loadExpenses() {
     const token = localStorage.getItem('accessToken');
     const tbody = document.getElementById('expenses-tbody');
+    const currentLang = localStorage.getItem('language') || 'uz';
+    const langMap = { 'uz': 'uz-UZ', 'ru': 'ru-RU', 'en': 'en-US' };
 
-    // Filtr qiymatlarini olish
     const categoryId = document.getElementById('filter-category').value;
     const dateFrom = document.getElementById('filter-date-from').value;
     const dateTo = document.getElementById('filter-date-to').value;
@@ -46,11 +53,9 @@ async function loadExpenses() {
         const response = await res.json();
         let transactions = response.data || [];
 
-        // --- FILTRLASH (Frontend qismida) ---
         if (categoryId !== 'all') {
             transactions = transactions.filter(t => {
                 if (!t.categoryId) return false;
-                // O'zining ID si yoki Parentining ID si mos kelsa
                 return t.categoryId._id === categoryId || (t.categoryId.parentId && t.categoryId.parentId._id === categoryId);
             });
         }
@@ -59,39 +64,37 @@ async function loadExpenses() {
         }
         if (dateTo) {
             const toDate = new Date(dateTo);
-            toDate.setHours(23, 59, 59); // Kun oxirigacha
+            toDate.setHours(23, 59, 59);
             transactions = transactions.filter(t => new Date(t.date) <= toDate);
         }
 
-        // Jadvalni tozalash
         tbody.innerHTML = '';
 
         if (transactions.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Xarajatlar topilmadi</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px;">${window.i18n.translations[currentLang].no_expenses_found}</td></tr>`;
             return;
         }
 
         transactions.forEach(t => {
-            const date = new Date(t.date).toLocaleDateString('uz-UZ');
+            const date = new Date(t.date).toLocaleDateString(langMap[currentLang]);
 
-            // Kategoriya nomini chiroyli ko'rsatish (Asosiy > Sub)
-            let categoryHtml = '<span class="category-badge">Kategoriyasiz</span>';
+            let categoryHtml = `<span class="category-badge">${window.i18n.translations[currentLang].no_category}</span>`;
             if (t.categoryId) {
                 const hasParent = t.categoryId.parentId && typeof t.categoryId.parentId === 'object';
                 if (hasParent) {
                     categoryHtml = `
                         <div class="category-badge">
                             <span>${t.categoryId.parentId.icon}</span>
-                            <span class="cat-parent-label">${t.categoryId.parentId.name}</span>
+                            <span class="cat-parent-label">${window.i18n.getCategoryName(t.categoryId.parentId.name)}</span>
                             <span class="cat-divider">/</span>
-                            <span class="cat-main-label">${t.categoryId.name}</span>
+                            <span class="cat-main-label">${window.i18n.getCategoryName(t.categoryId.name)}</span>
                         </div>
                     `;
                 } else {
                     categoryHtml = `
                         <div class="category-badge">
                             <span>${t.categoryId.icon}</span>
-                            <span class="cat-main-label">${t.categoryId.name}</span>
+                            <span class="cat-main-label">${window.i18n.getCategoryName(t.categoryId.name)}</span>
                         </div>
                     `;
                 }
@@ -104,7 +107,7 @@ async function loadExpenses() {
                 <td>${t.description}</td>
                 <td class="t-amount">-${t.amount.toLocaleString()} UZS</td>
                 <td>
-                    <button class="btn-delete" onclick="deleteTransaction('${t._id}')">O'chirish</button>
+                    <button class="btn-delete" onclick="deleteTransaction('${t._id}')">${window.i18n.translations[currentLang].btn_delete}</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -112,7 +115,6 @@ async function loadExpenses() {
 
     } catch (error) {
         console.error("Expenses load error:", error);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: red;">Xatolik yuz berdi</td></tr>';
     }
 }
 
@@ -123,9 +125,9 @@ function resetFilters() {
     loadExpenses();
 }
 
-// Global window ob'ektiga qo'shamizki, HTML dagi onclick ishlasin
 window.deleteTransaction = async (id) => {
-    if (!confirm("Haqiqatan ham bu xarajatni o'chirmoqchimisiz?")) return;
+    const currentLang = localStorage.getItem('language') || 'uz';
+    if (!confirm(window.i18n.translations[currentLang].delete_confirm)) return;
 
     const token = localStorage.getItem('accessToken');
     try {
@@ -135,11 +137,16 @@ window.deleteTransaction = async (id) => {
         });
 
         if (res.ok) {
-            loadExpenses(); // Jadvalni yangilash
+            loadExpenses();
         } else {
-            alert("O'chirishda xatolik yuz berdi");
+            alert(window.i18n.translations[currentLang].alert_error || "Error");
         }
     } catch (error) {
         console.error("Delete error:", error);
     }
 }
+
+window.addEventListener('languageChanged', () => {
+    loadCategories();
+    loadExpenses();
+});

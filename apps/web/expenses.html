@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="uz">
+
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xarajatlar</title>
+    <title data-i18n="expenses_web_title">Xarajatlar</title>
     <link rel="stylesheet" href="/src/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="dashboard-page">
     <div class="sidebar-overlay"></div>
-    
+
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="logo">ExpenseWise</div>
         <nav class="side-nav">
-            <a href="/dashboard.html">📊 Umumiy</a>
-            <a href="/expenses.html" class="active">💸 Xarajatlar</a>
-            <a href="/categories.html">🏷️ Kategoriyalar</a>
-            <a href="/reports.html">📈 Hisobotlar</a>
-            <a href="/settings.html">⚙️ Sozlamalar</a>
+            <a href="/dashboard.html"><span data-i18n="nav_dashboard">📊 Umumiy</span></a>
+            <a href="/expenses.html" class="active"><span data-i18n="nav_expenses">💸 Xarajatlar</span></a>
+            <a href="/categories.html"><span data-i18n="nav_categories">🏷️ Kategoriyalar</span></a>
+            <a href="/reports.html"><span data-i18n="nav_reports">📈 Hisobotlar</span></a>
+            <a href="/settings.html"><span data-i18n="nav_settings">⚙️ Sozlamalar</span></a>
         </nav>
-        <button id="logout-btn" class="btn-logout">Chiqish</button>
+        <button id="logout-btn" class="btn-logout" data-i18n="btn_logout">Chiqish</button>
     </aside>
 
     <main class="main-content">
@@ -33,11 +35,24 @@
                     <span></span>
                 </button>
                 <div class="welcome">
-                    <h1>Barcha xarajatlar</h1>
-                    <p>Xarajatlaringizni batafsil ko'ring va tahlil qiling</p>
+                    <h1 data-i18n="expenses_title">Barcha xarajatlar</h1>
+                    <p data-i18n="expenses_desc">Xarajatlaringizni batafsil ko'ring va tahlil qiling</p>
                 </div>
             </div>
             <div class="user-profile">
+                <!-- Custom Til tanlash dropdown -->
+                <div class="custom-lang-dropdown" id="lang-dropdown">
+                    <div class="lang-trigger">
+                        <span class="lang-icon">🌐</span>
+                        <span id="selected-lang">UZ</span>
+                        <span class="lang-arrow"></span>
+                    </div>
+                    <ul class="lang-options">
+                        <li data-value="uz">UZ</li>
+                        <li data-value="ru">RU</li>
+                        <li data-value="en">EN</li>
+                    </ul>
+                </div>
                 <button id="theme-toggle" class="btn-theme"></button>
                 <a href="/settings.html" title="Sozlamalar">
                     <div class="avatar">👤</div>
@@ -49,22 +64,22 @@
         <section class="filters-section card">
             <div class="filter-grid">
                 <div class="filter-group">
-                    <label>Kategoriya</label>
+                    <label data-i18n="table_category">Kategoriya</label>
                     <select id="filter-category">
-                        <option value="all">Barchasi</option>
+                        <option value="all" data-i18n="all_categories">Barchasi</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Sana (dan)</label>
+                    <label data-i18n="label_date_from">Sana (dan)</label>
                     <input type="date" id="filter-date-from">
                 </div>
                 <div class="filter-group">
-                    <label>Sana (gacha)</label>
+                    <label data-i18n="label_date_to">Sana (gacha)</label>
                     <input type="date" id="filter-date-to">
                 </div>
                 <div class="filter-actions">
-                    <button id="apply-filters" class="btn btn-primary">Saralash</button>
-                    <button id="reset-filters" class="btn btn-outline">Tozalash</button>
+                    <button id="apply-filters" class="btn btn-primary" data-i18n="btn_apply_filters">Saralash</button>
+                    <button id="reset-filters" class="btn btn-outline" data-i18n="btn_reset_filters">Tozalash</button>
                 </div>
             </div>
         </section>
@@ -75,11 +90,11 @@
                 <table class="transactions-table">
                     <thead>
                         <tr>
-                            <th>Sana</th>
-                            <th>Kategoriya</th>
-                            <th>Izoh</th>
-                            <th>Miqdor</th>
-                            <th>Amallar</th>
+                            <th data-i18n="table_date">Sana</th>
+                            <th data-i18n="table_category">Kategoriya</th>
+                            <th data-i18n="table_description">Izoh</th>
+                            <th data-i18n="table_amount">Miqdor</th>
+                            <th data-i18n="table_actions">Amallar</th>
                         </tr>
                     </thead>
                     <tbody id="expenses-tbody">
@@ -93,4 +108,5 @@
     <script src="/src/js/main.js" type="module"></script>
     <script src="/src/js/expenses.js" type="module"></script>
 </body>
+
 </html>

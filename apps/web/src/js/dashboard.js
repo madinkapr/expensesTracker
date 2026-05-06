@@ -5,6 +5,9 @@ const token = localStorage.getItem('accessToken');
 let expenseChartObj = null;
 let weeklyChartObj = null;
 let dashboardTransactions = [];
+let allCategories = []; // Kategoriyalarni saqlash uchun
+let currentBudget = null;
+let defaultAccountId = null;
 
 const getTextColor = () => document.documentElement.getAttribute('data-theme') === 'dark' ? 'white' : '#1f2937';
 
@@ -54,20 +57,9 @@ async function setupDashboard() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const catData = await catRes.json();
-        if (catData.data && categorySelect) {
-            const categories = catData.data;
-            const mainCats = categories.filter(c => !c.parentId);
-
-            let optionsHtml = '';
-            mainCats.forEach(main => {
-                optionsHtml += `<option value="${main._id}">${main.icon} ${main.name}</option>`;
-                const children = categories.filter(c => c.parentId === main._id);
-                children.forEach(child => {
-                    optionsHtml += `<option value="${child._id}">&nbsp;&nbsp;&nbsp;${child.icon} ${child.name}</option>`;
-                });
-            });
-
-            categorySelect.innerHTML = optionsHtml;
+        if (catData.data) {
+            allCategories = catData.data;
+            renderCategoryOptions(allCategories);
         }
     } catch (err) {
         console.error("Kategoriyalarni yuklashda xato:", err);
@@ -81,11 +73,28 @@ async function setupDashboard() {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saqlanmoqda...';
 
+            const selectedDate = document.getElementById('date').value;
+            const now = new Date();
+
+            // Mahalliy bugungi sanani aniqlaymiz (YYYY-MM-DD)
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const localTodayStr = `${year}-${month}-${day}`;
+
+            let finalDate;
+            if (selectedDate === localTodayStr || !selectedDate) {
+                finalDate = now.toISOString();
+            } else {
+                finalDate = new Date(selectedDate).toISOString();
+            }
+
             const formData = {
                 amount: Number(document.getElementById('amount').value),
                 categoryId: document.getElementById('category').value,
+                accountId: defaultAccountId, // Hisob ID sini yuboramiz
                 description: document.getElementById('description').value,
-                date: document.getElementById('date').value || new Date().toISOString(),
+                date: finalDate,
                 type: 'expense'
             };
 
@@ -104,7 +113,8 @@ async function setupDashboard() {
                     form.reset();
                     await loadDashboardData(); // Ma'lumotlarni yangilash
                 } else {
-                    alert("Xatolik yuz berdi");
+                    const errorBody = await res.json();
+                    alert("Xatolik: " + (errorBody.message || "Serverda xato yuz berdi"));
                 }
             } catch (err) {
                 alert("Server bilan aloqa yo'q");
@@ -121,8 +131,9 @@ async function setupDashboard() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const userData = await userRes.json();
-        if (userData.data && document.getElementById('user-welcome')) {
-            document.getElementById('user-welcome').textContent = `Xush kelibsiz, ${userData.data.name}!`;
+        if (userData.data) {
+            window.currentUserName = userData.data.name; // Ismni eslab qolamiz
+            updateWelcomeMessage(); // Salomlashishni yozamiz
         }
 
         // 2. Hisob va Kategoriyalarni tekshirish (faqat birinchi marta kirgan bo'lsa)
@@ -130,6 +141,9 @@ async function setupDashboard() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const accountsData = await accountsRes.json();
+        if (accountsData.data && accountsData.data.length > 0) {
+            defaultAccountId = accountsData.data[0]._id; // Birinchi topilgan hisobni saqlaymiz
+        }
 
         if (accountsData.data && accountsData.data.length === 0) {
             console.log("Dastlabki sozlamalar bajarilmoqda...");
@@ -138,6 +152,21 @@ async function setupDashboard() {
         }
     } catch (error) {
         console.error("Setup error:", error);
+    }
+}
+
+// BU FUNKSIYA TIL O'ZGARISHI BILAN SALOMLASHISHNI HAM O'ZGARTIRADI
+function updateWelcomeMessage() {
+    const welcomeEl = document.getElementById('user-welcome');
+    if (welcomeEl && window.currentUserName) {
+        const greetings = {
+            uz: "Xush kelibsiz",
+            ru: "Добро пожаловать",
+            en: "Welcome"
+        };
+        const currentLang = localStorage.getItem('language') || 'uz';
+        const greeting = greetings[currentLang] || greetings.uz;
+        welcomeEl.textContent = `${greeting}, ${window.currentUserName}!`;
     }
 }
 
@@ -157,7 +186,7 @@ async function loadDashboardData() {
 
         // Hozirgi oy budjetini topish
         const now = new Date();
-        const currentBudget = budgets.find(b => b.month === (now.getMonth() + 1) && b.year === now.getFullYear());
+        currentBudget = budgets.find(b => b.month === (now.getMonth() + 1) && b.year === now.getFullYear());
 
         renderStats(transactions, currentBudget);
         dashboardTransactions = transactions;
@@ -195,17 +224,28 @@ function renderStats(transactions, budget) {
     if (monthlyEl) monthlyEl.textContent = monthly.toLocaleString() + " UZS";
 
     if (limitLabelEl && limitValueEl) {
+        // Tilni aniqlash
+        const currentLang = localStorage.getItem('language') || 'uz';
+
+        const labels = {
+            uz: { remaining: "Limitdan qoldi", noLimit: "Limit belgilanmagan", setLimit: "Sozlamalarda o'rnating" },
+            ru: { remaining: "Остаток лимита", noLimit: "Лимит не установлен", setLimit: "Установите в настройках" },
+            en: { remaining: "Remaining Limit", noLimit: "No limit set", setLimit: "Set in settings" }
+        };
+
+        const currentLabels = labels[currentLang] || labels.uz;
+
         if (budget && budget.totalBudget > 0) {
             const limitAmount = budget.totalBudget;
             const remaining = limitAmount - monthly;
 
-            limitLabelEl.textContent = "Limitdan qoldi";
+            limitLabelEl.textContent = currentLabels.remaining;
             limitValueEl.textContent = (remaining > 0 ? remaining.toLocaleString() : 0) + " UZS";
             limitValueEl.style.fontSize = "";
             limitValueEl.style.color = remaining <= 0 ? "var(--danger)" : "";
         } else {
-            limitLabelEl.textContent = "Limit belgilanmagan";
-            limitValueEl.textContent = "Sozlamalarda o'rnating";
+            limitLabelEl.textContent = currentLabels.noLimit;
+            limitValueEl.textContent = currentLabels.setLimit;
             limitValueEl.style.fontSize = "14px";
             limitValueEl.style.color = "var(--text-muted)";
         }
@@ -217,32 +257,39 @@ function renderRecentActivity(transactions) {
     const listContainer = document.querySelector('.recent-activity');
     if (!listContainer) return;
 
+    // Tilni aniqlash
+    const currentLang = localStorage.getItem('language') || 'uz';
+    const labels = {
+        uz: { title: "Oxirgi xarajatlar", empty: "Hozircha hech qanday xarajat kiritilmagan.", other: "Boshqa" },
+        ru: { title: "Последние расходы", empty: "Расходов пока нет.", other: "Прочее" },
+        en: { title: "Recent Activity", empty: "No expenses recorded yet.", other: "Other" }
+    };
+    const cur = labels[currentLang] || labels.uz;
+
     if (transactions.length === 0) {
-        listContainer.innerHTML = `<h3>Oxirgi xarajatlar</h3><p style="text-align:center; padding: 20px; color: var(--text-muted);">Hozircha hech qanday xarajat kiritilmagan.</p>`;
+        listContainer.innerHTML = `<h3>${cur.title}</h3><p style="text-align:center; padding: 20px; color: var(--text-muted);">${cur.empty}</p>`;
         return;
     }
 
-    let html = `<h3>Oxirgi xarajatlar</h3><div class="transaction-list">`;
-    // Eng oxirgi 5 tasini ko'rsatish
+    let html = `<h3>${cur.title}</h3><div class="transaction-list">`;
     transactions.slice(0, 5).forEach(t => {
-        let categoryHtml = '<span class="cat-main-label">Boshqa</span>';
+        let categoryHtml = `<span class="cat-main-label">${cur.other}</span>`;
         let icon = '💰';
-        
+
         if (t.categoryId) {
-            // Agar parentId bor bo'lsa (ya'ni bu sub-kategoriya bo'lsa)
             const hasParent = t.categoryId.parentId && typeof t.categoryId.parentId === 'object';
             icon = hasParent ? t.categoryId.parentId.icon : t.categoryId.icon;
-            
+
             if (hasParent) {
                 categoryHtml = `
                     <div class="category-badge" style="background: none; border: none; padding: 0; box-shadow: none;">
-                        <span class="cat-parent-label">${t.categoryId.parentId.name}</span>
+                        <span class="cat-parent-label">${window.i18n.getCategoryName(t.categoryId.parentId.name)}</span>
                         <span class="cat-divider">/</span>
-                        <span class="cat-main-label">${t.categoryId.name}</span>
+                        <span class="cat-main-label">${window.i18n.getCategoryName(t.categoryId.name)}</span>
                     </div>
                 `;
             } else {
-                categoryHtml = `<span class="cat-main-label">${t.categoryId.name}</span>`;
+                categoryHtml = `<span class="cat-main-label">${window.i18n.getCategoryName(t.categoryId.name)}</span>`;
             }
         }
 
@@ -347,3 +394,35 @@ function renderWeeklyChart(transactions) {
         }
     });
 }
+
+function renderCategoryOptions(categories) {
+    const categorySelect = document.getElementById('category');
+    if (!categorySelect || !categories) return;
+
+    const mainCats = categories.filter(c => !c.parentId);
+    let optionsHtml = '';
+
+    mainCats.forEach(main => {
+        optionsHtml += `<option value="${main._id}">${main.icon} ${window.i18n.getCategoryName(main.name)}</option>`;
+        const children = categories.filter(c => c.parentId === main._id);
+        children.forEach(child => {
+            optionsHtml += `<option value="${child._id}">&nbsp;&nbsp;&nbsp;${child.icon} ${window.i18n.getCategoryName(child.name)}</option>`;
+        });
+    });
+
+    categorySelect.innerHTML = optionsHtml;
+}
+
+window.addEventListener('languageChanged', () => {
+    updateWelcomeMessage(); // TIL O'ZGARISHI BILAN BU HAM ISHLAYDI!
+    // 1. Statistikani qayta chizish
+    if (dashboardTransactions && dashboardTransactions.length > 0) {
+        renderStats(dashboardTransactions, currentBudget);
+        renderRecentActivity(dashboardTransactions);
+    }
+    // 2. Modal ichidagi kategoriyalarni qayta chizish
+    if (allCategories && allCategories.length > 0) {
+        renderCategoryOptions(allCategories);
+    }
+});
+

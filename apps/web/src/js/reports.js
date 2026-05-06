@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadReportsData() {
     const token = localStorage.getItem('accessToken');
+    const currentLang = localStorage.getItem('language') || 'uz';
 
     try {
         const res = await fetch(`${API_URL}/transactions`, {
@@ -32,12 +33,13 @@ async function loadReportsData() {
         const transactions = response.data || [];
 
         if (transactions.length === 0) {
-            document.querySelector('.main-content').innerHTML += '<p style="text-align:center; padding: 50px;">Hali ma\'lumotlar yo\'q. Hisobotlar shakllanishi uchun xarajatlar qo\'shing.</p>';
+            const container = document.querySelector('.main-content');
+            container.innerHTML += `<p style="text-align:center; padding: 50px; color: var(--text-muted);">${window.i18n.translations[currentLang].no_expenses_found}</p>`;
             return;
         }
 
-        renderStats(transactions);
         storedTransactions = transactions;
+        renderStats(transactions);
         renderDailyChart(transactions);
         renderCategoryChart(transactions);
         renderTopExpenses(transactions);
@@ -51,6 +53,7 @@ function renderStats(transactions) {
     const now = new Date();
     const thisMonth = now.getMonth();
     const thisYear = now.getFullYear();
+    const currentLang = localStorage.getItem('language') || 'uz';
 
     // 1. Ushbu oydagi jami xarajat
     const monthlyTotal = transactions
@@ -65,9 +68,9 @@ function renderStats(transactions) {
     // 2. Eng ko'p sarflangan kategoriya
     const catTotals = {};
     transactions.forEach(t => {
-        // Asosiy kategoriya bo'yicha guruhlash
-        const name = (t.categoryId && t.categoryId.parentId) ? t.categoryId.parentId.name : (t.categoryId ? t.categoryId.name : 'Noma\'lum');
-        catTotals[name] = (catTotals[name] || 0) + t.amount;
+        const name = (t.categoryId && t.categoryId.parentId) ? t.categoryId.parentId.name : (t.categoryId ? t.categoryId.name : 'Other');
+        const translatedName = name === 'Other' ? window.i18n.translations[currentLang].cat_other : window.i18n.getCategoryName(name);
+        catTotals[translatedName] = (catTotals[translatedName] || 0) + t.amount;
     });
 
     let topCat = '-';
@@ -80,14 +83,14 @@ function renderStats(transactions) {
     }
     document.getElementById('report-top-category').textContent = topCat;
 
-    // 3. O'rtacha kunlik xarajat (oxirgi 30 kun uchun)
+    // 3. O'rtacha kunlik xarajat
     document.getElementById('report-daily-average').textContent = `${Math.round(monthlyTotal / 30).toLocaleString()} UZS`;
 }
 
 function renderDailyChart(transactions) {
     const ctx = document.getElementById('dailyStatsChart');
+    const currentLang = localStorage.getItem('language') || 'uz';
 
-    // Oxirgi 30 kunlik massiv
     const last30Days = [];
     for (let i = 29; i >= 0; i--) {
         const d = new Date();
@@ -97,26 +100,18 @@ function renderDailyChart(transactions) {
 
     const dailyData = {};
     last30Days.forEach(day => dailyData[day] = 0);
-
     transactions.forEach(t => {
         const day = new Date(t.date).toISOString().split('T')[0];
-        if (dailyData.hasOwnProperty(day)) {
-            dailyData[day] += t.amount;
-        }
+        if (dailyData.hasOwnProperty(day)) dailyData[day] += t.amount;
     });
 
-    if (dailyChart) {
-        dailyChart.destroy();
-    }
-
-    const textColor = getTextColor();
-
+    if (dailyChart) dailyChart.destroy();
     dailyChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: last30Days.map(d => d.split('-')[2]), // Faqat kunlar (DD)
+            labels: last30Days.map(d => d.split('-')[2]),
             datasets: [{
-                label: 'Kunlik xarajat',
+                label: window.i18n.translations[currentLang].table_amount,
                 data: Object.values(dailyData),
                 backgroundColor: '#38bdf8',
                 borderRadius: 5
@@ -125,22 +120,10 @@ function renderDailyChart(transactions) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
-                    labels: { color: textColor }
-                }
-            },
+            plugins: { legend: { display: false } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { display: false },
-                    ticks: { color: textColor }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: { color: textColor }
-                }
+                y: { beginAtZero: true, grid: { display: false }, ticks: { color: getTextColor() } },
+                x: { grid: { display: false }, ticks: { color: getTextColor() } }
             }
         }
     });
@@ -148,20 +131,16 @@ function renderDailyChart(transactions) {
 
 function renderCategoryChart(transactions) {
     const ctx = document.getElementById('categoryDistributionChart');
+    const currentLang = localStorage.getItem('language') || 'uz';
     const catTotals = {};
 
     transactions.forEach(t => {
-        // Asosiy kategoriya bo'yicha guruhlash
-        const name = (t.categoryId && t.categoryId.parentId) ? t.categoryId.parentId.name : (t.categoryId ? t.categoryId.name : 'Noma\'lum');
-        catTotals[name] = (catTotals[name] || 0) + t.amount;
+        const name = (t.categoryId && t.categoryId.parentId) ? t.categoryId.parentId.name : (t.categoryId ? t.categoryId.name : 'Other');
+        const translatedName = name === 'Other' ? window.i18n.translations[currentLang].cat_other : window.i18n.getCategoryName(name);
+        catTotals[translatedName] = (catTotals[translatedName] || 0) + t.amount;
     });
 
-    if (categoryChart) {
-        categoryChart.destroy();
-    }
-
-    const textColor = getTextColor();
-
+    if (categoryChart) categoryChart.destroy();
     categoryChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -175,12 +154,7 @@ function renderCategoryChart(transactions) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: { color: textColor }
-                }
-            },
+            plugins: { legend: { position: 'right', labels: { color: getTextColor() } } },
             cutout: '65%'
         }
     });
@@ -188,43 +162,33 @@ function renderCategoryChart(transactions) {
 
 function renderTopExpenses(transactions) {
     const tbody = document.getElementById('top-expenses-tbody');
+    const currentLang = localStorage.getItem('language') || 'uz';
+    const langMap = { 'uz': 'uz-UZ', 'ru': 'ru-RU', 'en': 'en-US' };
 
-    // Sana bo'yicha teskari tartibda saralash va oxirgi 5 ta yozuvni olish
-    const top5 = [...transactions]
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 5);
+    const top5 = [...transactions].sort((a, b) => b.amount - a.amount).slice(0, 5);
 
     tbody.innerHTML = '';
     top5.forEach(t => {
-        let categoryHtml = '<span class="category-badge">Boshqa</span>';
-        if (t.categoryId) {
-            const hasParent = t.categoryId.parentId && typeof t.categoryId.parentId === 'object';
-            if (hasParent) {
-                categoryHtml = `
-                    <div class="category-badge">
-                        <span>${t.categoryId.parentId.icon}</span>
-                        <span class="cat-parent-label">${t.categoryId.parentId.name}</span>
-                        <span class="cat-divider">/</span>
-                        <span class="cat-main-label">${t.categoryId.name}</span>
-                    </div>
-                `;
-            } else {
-                categoryHtml = `
-                    <div class="category-badge">
-                        <span>${t.categoryId.icon}</span>
-                        <span class="cat-main-label">${t.categoryId.name}</span>
-                    </div>
-                `;
-            }
-        }
+        const date = new Date(t.date).toLocaleDateString(langMap[currentLang]);
+        const catName = t.categoryId ? window.i18n.getCategoryName(t.categoryId.name) : window.i18n.translations[currentLang].cat_other;
+        const icon = t.categoryId ? (t.categoryId.parentId ? t.categoryId.parentId.icon : t.categoryId.icon) : '💰';
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${new Date(t.date).toLocaleDateString('uz-UZ')}</td>
-            <td>${categoryHtml}</td>
-            <td>${t.description}</td>
+            <td>${date}</td>
+            <td><div class="category-badge"><span>${icon}</span> ${catName}</div></td>
+            <td>${t.description || '-'}</td>
             <td class="t-amount">-${t.amount.toLocaleString()} UZS</td>
         `;
         tbody.appendChild(tr);
     });
 }
+
+window.addEventListener('languageChanged', () => {
+    if (storedTransactions.length > 0) {
+        renderStats(storedTransactions);
+        renderDailyChart(storedTransactions);
+        renderCategoryChart(storedTransactions);
+        renderTopExpenses(storedTransactions);
+    }
+});

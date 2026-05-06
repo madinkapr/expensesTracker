@@ -165,7 +165,14 @@ function renderTopExpenses(transactions) {
     const currentLang = localStorage.getItem('language') || 'uz';
     const langMap = { 'uz': 'uz-UZ', 'ru': 'ru-RU', 'en': 'en-US' };
 
-    const top5 = [...transactions].sort((a, b) => b.amount - a.amount).slice(0, 5);
+    const top5 = [...transactions].sort((a, b) => {
+        // 1. Birinchi summaga qaraymiz (kattadan kichikka)
+        if (b.amount !== a.amount) {
+            return b.amount - a.amount;
+        }
+        // 2. Agar summa teng bo'lsa, yangi sanasini tepaga qo'yamiz
+        return new Date(b.date) - new Date(a.date);
+    }).slice(0, 5);
 
     tbody.innerHTML = '';
     top5.forEach(t => {

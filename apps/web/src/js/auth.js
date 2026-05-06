@@ -6,12 +6,13 @@ const loginForm = document.getElementById('login-form');
 // RO'YXATDAN O'TISH (Register)
 if (registerForm) {
   registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Sahifa yangilanishini to'xtatamiz
+    e.preventDefault();
+    const currentLang = localStorage.getItem('language') || 'uz';
+    const t = window.i18n.translations[currentLang];
     
-    // Tugmani yuklanish holatiga o'tkazish
     const btn = registerForm.querySelector('button');
     const originalText = btn.innerText;
-    btn.innerText = "Kutib turing...";
+    btn.innerText = t.btn_loading || "Wait...";
     btn.disabled = true;
 
     const name = document.getElementById('name').value;
@@ -26,12 +27,12 @@ if (registerForm) {
       });
 
       const response = await res.json();
-      if (!res.ok) throw new Error(response.message || "Ro'yxatdan o'tishda xatolik");
+      if (!res.ok) throw new Error(response.message || t.error_register);
 
-      alert("Muvaffaqiyatli ro'yxatdan o'tdingiz! Endi tizimga kiring.");
-      window.location.href = '/login.html'; // Login sahifasiga yo'naltirish
+      alert(t.alert_register_success);
+      window.location.href = '/login.html';
     } catch (err) {
-      alert("Xatolik: " + err.message);
+      alert(t.error_prefix + " " + err.message);
     } finally {
       btn.innerText = originalText;
       btn.disabled = false;
@@ -43,10 +44,12 @@ if (registerForm) {
 if (loginForm) {
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const currentLang = localStorage.getItem('language') || 'uz';
+    const t = window.i18n.translations[currentLang];
     
     const btn = loginForm.querySelector('button');
     const originalText = btn.innerText;
-    btn.innerText = "Kirilmoqda...";
+    btn.innerText = t.btn_logging_in || "Logging in...";
     btn.disabled = true;
 
     const email = document.getElementById('email').value;
@@ -60,19 +63,16 @@ if (loginForm) {
       });
 
       const response = await res.json();
-      if (!res.ok) throw new Error(response.message || "Email yoki parol xato");
+      if (!res.ok) throw new Error(response.message || t.error_login);
 
-      const data = response.data; // Backend 'data' ichida obyekt qaytaradi
-
-      // Tokenlarni brauzer xotirasiga (localStorage) saqlash
+      const data = response.data;
       localStorage.setItem('accessToken', data.token);
       localStorage.setItem('refreshToken', data.refreshToken);
 
-      alert("Tizimga kirdingiz!");
-      // Dashborad sahifasiga yo'naltirish
+      alert(t.alert_login_success);
       window.location.href = '/dashboard.html';
     } catch (err) {
-      alert("Xatolik: " + err.message);
+      alert(t.error_prefix + " " + err.message);
     } finally {
       btn.innerText = originalText;
       btn.disabled = false;

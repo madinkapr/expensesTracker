@@ -2,9 +2,12 @@ const API_URL = 'http://localhost:3000/api';
 
 document.getElementById('forgot-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const currentLang = localStorage.getItem('language') || 'uz';
+    const t = window.i18n.translations[currentLang];
+    
     const email = document.getElementById('email').value;
     const btn = e.target.querySelector('button');
-    btn.textContent = 'Yuborilmoqda...';
+    btn.textContent = t.btn_sending || 'Sending...';
     btn.disabled = true;
 
     try {
@@ -20,13 +23,13 @@ document.getElementById('forgot-form').addEventListener('submit', async (e) => {
             document.getElementById('step-email').style.display = 'none';
             document.getElementById('step-success').style.display = 'block';
         } else {
-            alert(data.message || 'Xatolik yuz berdi');
-            btn.textContent = 'Havola yuborish';
+            alert(data.message || t.error_general);
+            btn.textContent = t.btn_send_link;
             btn.disabled = false;
         }
     } catch (err) {
-        alert('Server bilan aloqa yo\'q');
-        btn.textContent = 'Havola yuborish';
+        alert(t.error_no_server || 'No server connection');
+        btn.textContent = t.btn_send_link;
         btn.disabled = false;
     }
 });

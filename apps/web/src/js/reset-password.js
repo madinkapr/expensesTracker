@@ -11,16 +11,19 @@ if (!token) {
 
 document.getElementById('reset-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const currentLang = localStorage.getItem('language') || 'uz';
+    const t = window.i18n.translations[currentLang];
+    
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (newPassword !== confirmPassword) {
-        alert('Parollar mos kelmadi!');
+        alert(t.error_pass_mismatch || 'Passwords do not match!');
         return;
     }
 
     const btn = e.target.querySelector('button');
-    btn.textContent = 'Yangilanmoqda...';
+    btn.textContent = t.btn_updating || 'Updating...';
     btn.disabled = true;
 
     try {
@@ -40,8 +43,8 @@ document.getElementById('reset-form').addEventListener('submit', async (e) => {
             document.getElementById('step-error').style.display = 'block';
         }
     } catch (err) {
-        alert('Server bilan aloqa yo\'q');
-        btn.textContent = 'Parolni yangilash';
+        alert(t.error_no_server || 'No server connection');
+        btn.textContent = t.btn_update_pass;
         btn.disabled = false;
     }
 });

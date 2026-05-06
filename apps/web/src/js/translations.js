@@ -1,12 +1,79 @@
 export const translations = {
     uz: {
-        // Sidebar
+        // Sidebar & Nav
         nav_dashboard: "📊 Umumiy",
         nav_expenses: "💸 Xarajatlar",
         nav_categories: "🏷️ Kategoriyalar",
         nav_reports: "📈 Hisobotlar",
         nav_settings: "⚙️ Sozlamalar",
+        nav_login: "Kirish",
+        nav_register: "Ro'yxatdan o'tish",
         btn_logout: "Chiqish",
+
+        // Landing Page
+        landing_title: "ExpenseWise - Moliyaviy Nazorat",
+        hero_title: "Xarajatlaringizni oson va aqlli boshqaring!",
+        hero_desc: "Qog'ozbozlik va murakkab hisob-kitoblarni unuting. ExpenseWise yordamida har bir tiyiningizni nazorat qiling va moliyaviy maqsadlaringizga tekinga erishing.",
+        btn_get_started: "Hoziroq boshlash",
+
+        // Login Page
+        login_title: "Kirish",
+        login_header: "Xush kelibsiz! 👋",
+        login_subheader: "Ilovaga kirish uchun ma'lumotlaringizni kiriting",
+        label_email: "Email manzil",
+        placeholder_email: "Sizning emailingiz...",
+        label_password: "Parol",
+        placeholder_password: "Parolingizni kiriting...",
+        btn_login: "Tizimga kirish",
+        no_account: "Hali hisobingiz yo'qmi?",
+        link_register: "Ro'yxatdan o'tish",
+        link_forgot_password: "Parolni unutdingizmi?",
+
+        // Register Page
+        register_title: "Ro'yxatdan o'tish",
+        register_header: "Ro'yxatdan o'tish 🚀",
+        register_subheader: "O'z xarajatlaringizni boshqarishni hoziroq boshlang",
+        label_full_name: "To'liq ismingiz",
+        placeholder_full_name: "Masalan: Ali Valiyev",
+        placeholder_new_password: "Kamida 6 ta belgi...",
+        have_account: "Allaqachon hisobingiz bormi?",
+        link_login: "Kirish",
+
+        // Forgot Password Page
+        forgot_password_title: "Parolni tiklash",
+        forgot_header: "🔐 Parolni tiklash",
+        forgot_subheader: "Emailingizni kiriting, parolni tiklash havolasi yuboramiz",
+        btn_send_link: "Havola yuborish",
+        link_back_to_login: "← Kirish sahifasiga qaytish",
+        email_sent_title: "Email yuborildi!",
+        email_sent_desc: "Emailingizni tekshiring va havolaga bosing.",
+
+        // Reset Password Page
+        reset_password_title: "Yangi parol",
+        reset_header: "🔑 Yangi parol o'rnatish",
+        reset_subheader: "Yangi parolingizni kiriting",
+        label_new_password: "Yangi parol",
+        label_confirm_password: "Parolni tasdiqlang",
+        placeholder_confirm_password: "Parolni qayta kiriting...",
+        pass_updated_title: "Parol yangilandi!",
+        pass_updated_desc: "Endi yangi parolingiz bilan kirishingiz mumkin.",
+        link_expired_title: "Havola eskirgan",
+        link_expired_desc: "Parolni tiklash havolasi 15 daqiqa davomida amal qiladi.",
+        btn_request_again: "Qaytadan so'rash",
+
+        // JS Alerts & Statuses
+        btn_loading: "Kutib turing...",
+        btn_logging_in: "Kirilmoqda...",
+        btn_sending: "Yuborilmoqda...",
+        btn_updating: "Yangilanmoqda...",
+        error_register: "Ro'yxatdan o'tishda xatolik",
+        error_login: "Email yoki parol xato",
+        error_prefix: "Xatolik:",
+        error_general: "Xatolik yuz berdi",
+        error_no_server: "Server bilan aloqa yo'q",
+        error_pass_mismatch: "Parollar mos kelmadi!",
+        alert_register_success: "Muvaffaqiyatli ro'yxatdan o'tdingiz! Endi tizimga kiring.",
+        alert_login_success: "Tizimga kirdingiz!",
 
         // Dashboard
         dashboard_web_title: "Umumiy",
@@ -114,13 +181,80 @@ export const translations = {
         top_expenses_title: "Eng qimmat xarajatlar"
     },
     ru: {
-        // Sidebar
+        // Sidebar & Nav
         nav_dashboard: "📊 Главная",
         nav_expenses: "💸 Расходы",
         nav_categories: "🏷️ Категории",
         nav_reports: "📈 Отчеты",
         nav_settings: "⚙️ Настройки",
+        nav_login: "Войти",
+        nav_register: "Регистрация",
         btn_logout: "Выйти",
+
+        // Landing Page
+        landing_title: "ExpenseWise - Финансовый Контроль",
+        hero_title: "Управляйте своими расходами легко и умно!",
+        hero_desc: "Забудьте о бумажной волоките и сложных расчетах. Контролируйте каждую копейку с ExpenseWise и достигайте своих финансовых целей бесплатно.",
+        btn_get_started: "Начать сейчас",
+
+        // Login Page
+        login_title: "Вход",
+        login_header: "Добро пожаловать! 👋",
+        login_subheader: "Введите свои данные для входа в приложение",
+        label_email: "Email адрес",
+        placeholder_email: "Ваш email...",
+        label_password: "Пароль",
+        placeholder_password: "Введите ваш пароль...",
+        btn_login: "Войти в систему",
+        no_account: "Еще нет аккаунта?",
+        link_register: "Зарегистрироваться",
+        link_forgot_password: "Забыли пароль?",
+
+        // Register Page
+        register_title: "Регистрация",
+        register_header: "Регистрация 🚀",
+        register_subheader: "Начните управлять своими расходами прямо сейчас",
+        label_full_name: "Полное имя",
+        placeholder_full_name: "Например: Иван Иванов",
+        placeholder_new_password: "Минимум 6 символов...",
+        have_account: "Уже есть аккаунт?",
+        link_login: "Войти",
+
+        // Forgot Password Page
+        forgot_password_title: "Восстановление пароля",
+        forgot_header: "🔐 Восстановление пароля",
+        forgot_subheader: "Введите ваш email, мы отправим ссылку для сброса пароля",
+        btn_send_link: "Отправить ссылку",
+        link_back_to_login: "← Вернуться на страницу входа",
+        email_sent_title: "Email отправлен!",
+        email_sent_desc: "Проверьте свою почту и перейдите по ссылке.",
+
+        // Reset Password Page
+        reset_password_title: "Новый пароль",
+        reset_header: "🔑 Установка нового пароля",
+        reset_subheader: "Введите ваш новый пароль",
+        label_new_password: "Новый пароль",
+        label_confirm_password: "Подтвердите пароль",
+        placeholder_confirm_password: "Введите пароль еще раз...",
+        pass_updated_title: "Пароль обновлен!",
+        pass_updated_desc: "Теперь вы можете войти с новым паролем.",
+        link_expired_title: "Ссылка истекла",
+        link_expired_desc: "Ссылка для сброса пароля действительна в течение 15 минут.",
+        btn_request_again: "Запросить снова",
+
+        // JS Alerts & Statuses
+        btn_loading: "Пожалуйста, подождите...",
+        btn_logging_in: "Вход...",
+        btn_sending: "Отправка...",
+        btn_updating: "Обновление...",
+        error_register: "Ошибка при регистрации",
+        error_login: "Неверный email или пароль",
+        error_prefix: "Ошибка:",
+        error_general: "Произошла ошибка",
+        error_no_server: "Нет связи с сервером",
+        error_pass_mismatch: "Пароли не совпадают!",
+        alert_register_success: "Вы успешно зарегистрировались! Теперь войдите.",
+        alert_login_success: "Вы вошли в систему!",
 
         // Dashboard
         dashboard_web_title: "Главная",
@@ -228,13 +362,80 @@ export const translations = {
         top_expenses_title: "Самые дорогие расходы"
     },
     en: {
-        // Sidebar
+        // Sidebar & Nav
         nav_dashboard: "📊 Dashboard",
         nav_expenses: "💸 Expenses",
         nav_categories: "🏷️ Categories",
         nav_reports: "📈 Reports",
         nav_settings: "⚙️ Settings",
+        nav_login: "Login",
+        nav_register: "Register",
         btn_logout: "Logout",
+
+        // Landing Page
+        landing_title: "ExpenseWise - Financial Control",
+        hero_title: "Manage your expenses easily and smartly!",
+        hero_desc: "Forget paper records and complex calculations. Control every penny with ExpenseWise and achieve your financial goals for free.",
+        btn_get_started: "Start Now",
+
+        // Login Page
+        login_title: "Login",
+        login_header: "Welcome! 👋",
+        login_subheader: "Enter your details to log in to the app",
+        label_email: "Email Address",
+        placeholder_email: "Your email...",
+        label_password: "Password",
+        placeholder_password: "Enter your password...",
+        btn_login: "Login to System",
+        no_account: "Don't have an account yet?",
+        link_register: "Sign Up",
+        link_forgot_password: "Forgot password?",
+
+        // Register Page
+        register_title: "Register",
+        register_header: "Sign Up 🚀",
+        register_subheader: "Start managing your expenses right now",
+        label_full_name: "Full Name",
+        placeholder_full_name: "e.g., John Doe",
+        placeholder_new_password: "Minimum 6 characters...",
+        have_account: "Already have an account?",
+        link_login: "Login",
+
+        // Forgot Password Page
+        forgot_password_title: "Password Recovery",
+        forgot_header: "🔐 Password Recovery",
+        forgot_subheader: "Enter your email, we'll send a password reset link",
+        btn_send_link: "Send Link",
+        link_back_to_login: "← Back to Login",
+        email_sent_title: "Email Sent!",
+        email_sent_desc: "Check your email and click the link.",
+
+        // Reset Password Page
+        reset_password_title: "New Password",
+        reset_header: "🔑 Set New Password",
+        reset_subheader: "Enter your new password",
+        label_new_password: "New Password",
+        label_confirm_password: "Confirm Password",
+        placeholder_confirm_password: "Enter password again...",
+        pass_updated_title: "Password Updated!",
+        pass_updated_desc: "Now you can log in with your new password.",
+        link_expired_title: "Link Expired",
+        link_expired_desc: "The password reset link is valid for 15 minutes.",
+        btn_request_again: "Request Again",
+
+        // JS Alerts & Statuses
+        btn_loading: "Please wait...",
+        btn_logging_in: "Logging in...",
+        btn_sending: "Sending...",
+        btn_updating: "Updating...",
+        error_register: "Registration error",
+        error_login: "Invalid email or password",
+        error_prefix: "Error:",
+        error_general: "An error occurred",
+        error_no_server: "No server connection",
+        error_pass_mismatch: "Passwords do not match!",
+        alert_register_success: "You have registered successfully! Now log in.",
+        alert_login_success: "You are logged in!",
 
         // Dashboard
         dashboard_web_title: "Dashboard",

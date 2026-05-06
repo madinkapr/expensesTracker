@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="uz">
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ExpenseWise</title>
+  <title data-i18n="landing_title">ExpenseWise</title>
 </head>
 
 <body>
@@ -14,20 +14,33 @@
     <nav class="navbar">
       <div class="logo">ExpenseWise</div>
       <div class="nav-links">
+        <!-- Til tanlash dropdown -->
+        <div class="custom-lang-dropdown" id="lang-dropdown">
+          <div class="lang-trigger">
+            <span class="lang-icon">🌐</span>
+            <span id="selected-lang">UZ</span>
+            <span class="lang-arrow"></span>
+          </div>
+          <ul class="lang-options">
+            <li data-value="uz">UZ</li>
+            <li data-value="ru">RU</li>
+            <li data-value="en">EN</li>
+          </ul>
+        </div>
+
         <button id="theme-toggle" class="btn-theme"></button>
-        <a href="/login.html" class="btn btn-outline">Kirish</a>
-        <a href="/register.html" class="btn btn-primary">Ro'yxatdan o'tish</a>
+        <a href="/login.html" class="btn btn-outline" data-i18n="nav_login">Kirish</a>
+        <a href="/register.html" class="btn btn-primary" data-i18n="nav_register">Ro'yxatdan o'tish</a>
       </div>
     </nav>
 
     <!-- Hero Qismi (Asosiy ekran) -->
     <header class="hero">
       <div class="hero-content">
-        <h1>Xarajatlaringizni oson va aqlli boshqaring!</h1>
-        <p>Qog'ozbozlik va murakkab hisob-kitoblarni unuting. ExpenseWise yordamida har bir tiyiningizni nazorat qiling
-          va moliyaviy maqsadlaringizga tekinga erishing.</p>
+        <h1 data-i18n="hero_title">Xarajatlaringizni oson va aqlli boshqaring!</h1>
+        <p data-i18n="hero_desc">Qog'ozbozlik va murakkab hisob-kitoblarni unuting. ExpenseWise yordamida har bir tiyiningizni nazorat qiling va moliyaviy maqsadlaringizga tekinga erishing.</p>
         <div class="hero-buttons">
-          <a href="/register.html" class="btn btn-primary btn-large">Hoziroq boshlash</a>
+          <a href="/register.html" class="btn btn-primary btn-large" data-i18n="btn_get_started">Hoziroq boshlash</a>
         </div>
       </div>
     </header>

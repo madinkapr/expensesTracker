@@ -1,41 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />  
-    <title>Kirish</title>
+    <title data-i18n="login_title">Kirish</title>
 </head>
 <body class="auth-page">
     
     <div class="auth-container">
         <div class="auth-header">
-            <h2>Xush kelibsiz! 👋</h2>
-            <p>Ilovaga kirish uchun ma'lumotlaringizni kiriting</p>
+            <h2 data-i18n="login_header">Xush kelibsiz! 👋</h2>
+            <p data-i18n="login_subheader">Ilovaga kirish uchun ma'lumotlaringizni kiriting</p>
         </div>
 
         <form id="login-form">
             <div class="form-group">
-                <label for="email">Email manzil</label>
-                <input type="email" id="email" placeholder="Sizning emailingiz..." required autocomplete="email">
+                <label for="email" data-i18n="label_email">Email manzil</label>
+                <input type="email" id="email" placeholder="Sizning emailingiz..." required autocomplete="email" data-i18n="placeholder_email">
             </div>
 
             <div class="form-group">
-                <label for="password">Parol</label>
-                <input type="password" id="password" placeholder="Parolingizni kiriting..." required autocomplete="current-password">
+                <label for="password" data-i18n="label_password">Parol</label>
+                <input type="password" id="password" placeholder="Parolingizni kiriting..." required autocomplete="current-password" data-i18n="placeholder_password">
             </div>
 
-            <!-- Hozircha oddiy tugma, keyin JS ulaymiz -->
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Tizimga kirish</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;" data-i18n="btn_login">Tizimga kirish</button>
         </form>
 
         <div class="auth-footer">
-            <p>Hali hisobingiz yo'qmi? <a href="/register.html">Ro'yxatdan o'tish</a></p>
-            <p style="margin-top: 10px;"><a href="/forgot-password.html">Parolni unutdingizmi?</a></p>
+            <p><span data-i18n="no_account">Hali hisobingiz yo'qmi?</span> <a href="/register.html" data-i18n="link_register">Ro'yxatdan o'tish</a></p>
+            <p style="margin-top: 10px;"><a href="/forgot-password.html" data-i18n="link_forgot_password">Parolni unutdingizmi?</a></p>
         </div>
     </div>
 
-    <!-- main.js ulanadi (CSS va Dark Mode uchun) -->
     <script src="/src/js/main.js" type="module"></script>
 </body>
 </html>

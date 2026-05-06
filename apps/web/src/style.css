@@ -149,9 +149,7 @@ body {
 }
 
 .btn-theme:hover {
-  background: rgba(31, 138, 112, 0.25);
-  transform: rotate(15deg) scale(1.1);
-  color: var(--text-dark);
+  border-color: #10b981;
 }
 
 /* ================================
@@ -1280,14 +1278,14 @@ input[type=number]::-webkit-outer-spin-button {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
   pointer-events: none;
 }
 
 .stat-card:hover {
   transform: translateY(-10px) scale(1.02);
   border-color: var(--primary-color);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 .stat-card h3 {
@@ -1333,10 +1331,10 @@ input[type=number]::-webkit-outer-spin-button {
   align-items: center;
   gap: 8px;
   padding: 6px 16px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .cat-parent-label {
@@ -1488,4 +1486,99 @@ input[type=number]::-webkit-outer-spin-button {
 
 .add-sub-btn:hover {
   background: var(--primary-color) !important;
+}
+
+.custom-lang-dropdown {
+  position: relative;
+  user-select: none;
+  margin-right: 15px;
+}
+
+.lang-trigger {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lang-trigger:hover {
+  border-color: #10b981;
+  /* transform: rotate(-2deg) scale(1.05); */
+}
+
+.lang-icon {
+  margin-right: 8px;
+  transition: transform 0.6s ease;
+}
+
+.lang-trigger:hover .lang-icon {
+  transform: rotate(180deg);
+}
+
+.lang-arrow {
+  width: 10px;
+  height: 10px;
+  margin-left: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: transform 0.3s ease;
+}
+
+/* Dropdown Menu */
+.lang-options {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 6px;
+  list-style: none;
+  min-width: 80px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.custom-lang-dropdown.active .lang-options {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.custom-lang-dropdown.active .lang-arrow {
+  transform: rotate(180deg);
+}
+
+.lang-options li {
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: center;
+}
+
+.lang-options li:hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+/* Dark mode sozlamalari */
+[data-theme="dark"] .lang-trigger {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .lang-options {
+  background: #1e293b;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }

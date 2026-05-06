@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/login.html';
         return;
     }
-    
+
     await loadCategories();
     setupCategoryModal();
 });
@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadCategories() {
     const grid = document.getElementById('categories-grid');
     const mainCatsList = document.getElementById('main-cats-list');
-    
+    const currentLang = localStorage.getItem('language') || 'uz';
+
     try {
         const res = await fetch(`${API_URL}/categories`, {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -22,32 +23,32 @@ async function loadCategories() {
         const result = await res.json();
         const categories = result.data || [];
 
-        // 1. Datalist ni to'ldirish (takliflar uchun)
+        // 1. Datalist ni to'ldirish
         const mainCats = categories.filter(c => !c.parentId && c.name !== 'Boshqa');
-        mainCatsList.innerHTML = mainCats.map(c => `<option value="${c.name}">`).join('');
+        mainCatsList.innerHTML = mainCats.map(c => `<option value="${window.i18n.getCategoryName(c.name)}">`).join('');
 
         // 2. Gridni render qilish
         if (categories.length === 0) {
-            grid.innerHTML = '<p class="loading">Kategoriyalar topilmadi.</p>';
+            grid.innerHTML = `<p class="loading">${window.i18n.translations[currentLang].no_categories_found || 'No categories'}</p>`;
             return;
         }
 
         let html = '';
         mainCats.forEach(main => {
             const children = categories.filter(c => c.parentId === main._id);
-            
+
             html += `
                 <div class="category-group">
                     <div class="category-card" data-id="${main._id}">
                         <div class="category-main">
                             <div class="category-icon-box">${main.icon}</div>
                             <div class="category-info">
-                                <h4>${main.name}</h4>
-                                <small>${main.type === 'expense' ? 'Xarajat' : 'Daromad'}</small>
+                                <h4>${window.i18n.getCategoryName(main.name)}</h4>
+                                <small>${main.type === 'expense' ? window.i18n.translations[currentLang].type_expense : window.i18n.translations[currentLang].type_income}</small>
                             </div>
                         </div>
                         <div class="category-actions">
-                            <button class="btn-icon add-sub-btn" data-name="${main.name}" title="Sub-kategoriya qo'shish">➕</button>
+                            <button class="btn-icon add-sub-btn" data-name="${main.name}" title="${window.i18n.translations[currentLang].add_sub_category || 'Add Sub'}">➕</button>
                             ${!main.isDefault ? `<button class="btn-icon delete-cat" data-id="${main._id}">🗑️</button>` : ''}
                         </div>
                     </div>
@@ -58,7 +59,7 @@ async function loadCategories() {
                                     <div class="category-main">
                                         <div class="category-icon-box">${child.icon}</div>
                                         <div class="category-info">
-                                            <h4>${child.name}</h4>
+                                            <h4>${window.i18n.getCategoryName(child.name)}</h4>
                                         </div>
                                     </div>
                                     <div class="category-actions">
@@ -79,7 +80,7 @@ async function loadCategories() {
             btn.onclick = () => {
                 const modal = document.getElementById('category-modal');
                 const parentInput = document.getElementById('cat-parent-name');
-                parentInput.value = btn.dataset.name;
+                parentInput.value = window.i18n.getCategoryName(btn.dataset.name);
                 modal.style.display = 'flex';
                 document.getElementById('cat-name').focus();
             };
@@ -87,8 +88,8 @@ async function loadCategories() {
 
         // O'chirish tugmalari
         document.querySelectorAll('.delete-cat').forEach(btn => {
-            btn.onclick = async (e) => {
-                if (confirm('Ushbu kategoriyani o\'chirmoqchimisiz?')) {
+            btn.onclick = async () => {
+                if (confirm(window.i18n.translations[currentLang].delete_confirm)) {
                     await deleteCategory(btn.dataset.id);
                 }
             };
@@ -96,7 +97,7 @@ async function loadCategories() {
 
     } catch (err) {
         console.error("Xatolik:", err);
-        grid.innerHTML = '<p class="loading">Yuklashda xato yuz berdi.</p>';
+        grid.innerHTML = '<p class="loading">Error</p>';
     }
 }
 
@@ -105,14 +106,17 @@ function setupCategoryModal() {
     const btn = document.getElementById('add-category-btn');
     const closeBtn = document.querySelector('.close-modal');
     const form = document.getElementById('category-form');
+    const currentLang = localStorage.getItem('language') || 'uz';
 
-    btn.onclick = () => modal.style.display = 'flex';
-    closeBtn.onclick = () => modal.style.display = 'none';
+    if (btn) btn.onclick = () => modal.style.display = 'flex';
+    if (closeBtn) closeBtn.onclick = () => modal.style.display = 'none';
     window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
     form.onsubmit = async (e) => {
         e.preventDefault();
-        
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+
         const name = document.getElementById('cat-name').value;
         const icon = document.getElementById('cat-icon').value;
         const type = document.getElementById('cat-type').value;
@@ -121,48 +125,29 @@ function setupCategoryModal() {
         let parentId = null;
 
         try {
-            // 1. Agar parentName yozilgan bo'lsa, uni ID sini topish yoki yaratish
             if (parentName) {
-                const res = await fetch(`${API_URL}/categories`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const res = await fetch(`${API_URL}/categories`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const result = await res.json();
                 const categories = result.data || [];
-                
-                const existingParent = categories.find(c => c.name.toLowerCase() === parentName.toLowerCase() && !c.parentId);
-                
+                const existingParent = categories.find(c => (c.name.toLowerCase() === parentName.toLowerCase() || window.i18n.getCategoryName(c.name).toLowerCase() === parentName.toLowerCase()) && !c.parentId);
+
                 if (existingParent) {
                     parentId = existingParent._id;
                 } else {
-                    // Yangi asosiy kategoriya yaratish
                     const newParentRes = await fetch(`${API_URL}/categories`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            name: parentName,
-                            icon: '📁', // Default ikonka
-                            type: type
-                        })
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ name: parentName, icon: '📁', type: type })
                     });
                     const newParentData = await newParentRes.json();
-                    if (newParentRes.ok) {
-                        parentId = newParentData.data._id;
-                    } else {
-                        throw new Error(newParentData.message || "Asosiy kategoriyani yaratib bo'lmadi");
-                    }
+                    if (newParentRes.ok) parentId = newParentData.data._id;
+                    else throw new Error(newParentData.message);
                 }
             }
 
-            // 2. Haqiqiy kategoriyani yaratish
             const res = await fetch(`${API_URL}/categories`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ name, icon, type, parentId })
             });
 
@@ -172,16 +157,18 @@ function setupCategoryModal() {
                 await loadCategories();
             } else {
                 const data = await res.json();
-                alert(data.message || "Xatolik yuz berdi");
+                alert(data.message);
             }
         } catch (err) {
-            alert(err.message || "Server bilan aloqa yo'q");
+            alert(err.message);
+        } finally {
+            submitBtn.disabled = false;
         }
     };
 }
 
-
 async function deleteCategory(id) {
+    const currentLang = localStorage.getItem('language') || 'uz';
     try {
         const res = await fetch(`${API_URL}/categories/${id}`, {
             method: 'DELETE',
@@ -190,9 +177,14 @@ async function deleteCategory(id) {
         if (res.ok) {
             await loadCategories();
         } else {
-            alert("O'chirishda xatolik (Balki bu standart kategoriyadir)");
+            alert(window.i18n.translations[currentLang].alert_error);
         }
     } catch (err) {
-        alert("Server bilan aloqa yo'q");
+        alert("Error");
     }
 }
+
+// TIL O'ZGARGANDA SAHIFANI RE-RENDER QILISH
+window.addEventListener('languageChanged', () => {
+    loadCategories();
+});

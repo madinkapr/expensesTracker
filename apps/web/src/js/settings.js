@@ -8,9 +8,10 @@ let avatarRemoved = false;
 function getUserIdFromToken() {
     const token = localStorage.getItem('accessToken');
     if (!token) return null;
-
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.id; // yoki payload.userId (token structure ga qarab)
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.id;
+    } catch (e) { return null; }
 }
 
 const initAvatarControls = () => {
@@ -18,15 +19,9 @@ const initAvatarControls = () => {
     const removeBtn = document.getElementById('avatar-remove');
     const preview = document.getElementById('avatar-preview');
 
-    if (fileInput) {
-        fileInput.addEventListener('change', handleAvatarUpload);
-    }
-    if (removeBtn) {
-        removeBtn.addEventListener('click', removeAvatarSelection);
-    }
-    if (preview) {
-        preview.addEventListener('click', handleAvatarPreviewClick);
-    }
+    if (fileInput) fileInput.addEventListener('change', handleAvatarUpload);
+    if (removeBtn) removeBtn.addEventListener('click', removeAvatarSelection);
+    if (preview) preview.addEventListener('click', handleAvatarPreviewClick);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,14 +29,18 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUserData();
     loadBudgetData();
 
-    // Formlarni bog'lash
-    document.getElementById('profile-form').addEventListener('submit', updateProfile);
-    document.getElementById('budget-form').addEventListener('submit', updateBudget);
-    document.getElementById('password-form').addEventListener('submit', updatePassword);
+    const profileForm = document.getElementById('profile-form');
+    const budgetForm = document.getElementById('budget-form');
+    const passwordForm = document.getElementById('password-form');
+
+    if (profileForm) profileForm.addEventListener('submit', updateProfile);
+    if (budgetForm) budgetForm.addEventListener('submit', updateBudget);
+    if (passwordForm) passwordForm.addEventListener('submit', updatePassword);
 });
 
 async function loadUserData() {
     const token = localStorage.getItem('accessToken');
+    const currentLang = localStorage.getItem('language') || 'uz';
     try {
         const res = await fetch(`${API_URL}/users/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -50,8 +49,10 @@ async function loadUserData() {
         const user = response.data;
 
         if (user) {
-            document.getElementById('settings-name').value = user.name;
-            document.getElementById('settings-email').value = user.email;
+            const nameEl = document.getElementById('settings-name');
+            const emailEl = document.getElementById('settings-email');
+            if (nameEl) nameEl.value = user.name;
+            if (emailEl) emailEl.value = user.email;
         }
         loadStoredAvatar();
         const userId = getUserIdFromToken();
@@ -76,7 +77,8 @@ function updateAvatarPreview(imageData) {
 function updateAvatarFilename(name) {
     const filenameEl = document.getElementById('avatar-filename');
     if (!filenameEl) return;
-    filenameEl.textContent = name || 'Hech rasm tanlanmadi';
+    const currentLang = localStorage.getItem('language') || 'uz';
+    filenameEl.textContent = name || window.i18n.translations[currentLang].no_pic;
 }
 
 function loadStoredAvatar() {
@@ -88,7 +90,7 @@ function loadStoredAvatar() {
     const imageName = localStorage.getItem(AVATAR_NAME_KEY);
 
     updateAvatarPreview(savedAvatarData);
-    updateAvatarFilename(imageName || (savedAvatarData ? 'Tanlangan profil rasmi' : null));
+    updateAvatarFilename(imageName);
 
     tempAvatarData = null;
     tempAvatarName = null;
@@ -120,9 +122,7 @@ async function handleAvatarUpload(e) {
 
 function removeAvatarSelection() {
     const fileInput = document.getElementById('settings-avatar');
-    if (fileInput) {
-        fileInput.value = '';
-    }
+    if (fileInput) fileInput.value = '';
     tempAvatarData = null;
     tempAvatarName = null;
     avatarRemoved = true;
@@ -169,18 +169,15 @@ async function loadBudgetData() {
         });
         const response = await res.json();
         const budgets = response.data || [];
-
-        // Hozirgi oy va yilni olish
         const now = new Date();
         const month = now.getMonth() + 1;
         const year = now.getFullYear();
-
-        // Shu oy uchun budjet bor-yo'qligini tekshirish
         const currentBudget = budgets.find(b => b.month === month && b.year === year);
 
         if (currentBudget) {
             currentBudgetId = currentBudget._id;
-            document.getElementById('settings-budget').value = currentBudget.totalBudget;
+            const budgetEl = document.getElementById('settings-budget');
+            if (budgetEl) budgetEl.value = currentBudget.totalBudget;
         }
     } catch (error) {
         console.error("Budget load error:", error);
@@ -192,22 +189,20 @@ async function updateProfile(e) {
     const token = localStorage.getItem('accessToken');
     const name = document.getElementById('settings-name').value;
     const email = document.getElementById('settings-email').value;
+    const currentLang = localStorage.getItem('language') || 'uz';
 
     try {
         const res = await fetch(`${API_URL}/users/me`, {
             method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email })
         });
 
         if (res.ok) {
             await applyAvatarChanges();
-            alert("Profil muvaffaqiyatli yangilandi!");
+            alert(window.i18n.translations[currentLang].alert_profile_updated || "Profile updated!");
         } else {
-            alert("Xatolik yuz berdi");
+            alert(window.i18n.translations[currentLang].alert_error);
         }
     } catch (error) {
         console.error("Profile update error:", error);
@@ -243,6 +238,7 @@ async function updateBudget(e) {
     e.preventDefault();
     const token = localStorage.getItem('accessToken');
     const totalBudget = Number(document.getElementById('settings-budget').value);
+    const currentLang = localStorage.getItem('language') || 'uz';
 
     const now = new Date();
     const month = now.getMonth() + 1;
@@ -251,32 +247,24 @@ async function updateBudget(e) {
     try {
         let res;
         if (currentBudgetId) {
-            // Bor bo'lsa yangilash
             res = await fetch(`${API_URL}/budgets/${currentBudgetId}`, {
                 method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ totalBudget })
             });
         } else {
-            // Yo'q bo'lsa yaratish
             res = await fetch(`${API_URL}/budgets`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ month, year, totalBudget })
             });
         }
 
         if (res.ok) {
-            alert("Oylik limit yangilandi!");
-            loadBudgetData(); // ID ni olish uchun qayta yuklash
+            alert(window.i18n.translations[currentLang].alert_limit_updated || "Limit updated!");
+            loadBudgetData();
         } else {
-            alert("Xatolik yuz berdi");
+            alert(window.i18n.translations[currentLang].alert_error);
         }
     } catch (error) {
         console.error("Budget update error:", error);
@@ -287,27 +275,25 @@ async function updatePassword(e) {
     e.preventDefault();
     const token = localStorage.getItem('accessToken');
     const password = document.getElementById('settings-password').value;
+    const currentLang = localStorage.getItem('language') || 'uz';
 
     if (!password) {
-        alert("Iltimos, yangi parolni kiriting");
+        alert(window.i18n.translations[currentLang].alert_enter_password || "Enter password");
         return;
     }
 
     try {
         const res = await fetch(`${API_URL}/users/me`, {
             method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ password })
         });
 
         if (res.ok) {
-            alert("Parol muvaffaqiyatli yangilandi!");
+            alert(window.i18n.translations[currentLang].alert_pass_updated || "Password updated!");
             document.getElementById('settings-password').value = '';
         } else {
-            alert("Xatolik yuz berdi");
+            alert(window.i18n.translations[currentLang].alert_error);
         }
     } catch (error) {
         console.error("Password update error:", error);
@@ -317,10 +303,15 @@ async function updatePassword(e) {
 export function loadAvatarForWholeApp() {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
-
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const userId = payload.id;
-
-    const avatar = localStorage.getItem(`profileImage_${userId}`);
-    updatePageAvatar(avatar);
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const userId = payload.id;
+        const avatar = localStorage.getItem(`profileImage_${userId}`);
+        updatePageAvatar(avatar);
+    } catch (e) {}
 }
+
+window.addEventListener('languageChanged', () => {
+    loadUserData();
+    loadBudgetData();
+});

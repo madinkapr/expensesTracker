@@ -1,18 +1,115 @@
 import '../style.css'
 import './auth.js'
 import { loadAvatarForWholeApp } from './settings.js';
+import { translations } from './translations.js';
 
 // Dark mode sahifa yuklangunga qadar ham ishlashi uchun
 // (fon o'zgarmasligi uchun)
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'dark') {
-  document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.setAttribute('data-theme', 'dark');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- I18N (Multi-language) ---
+    const i18n = {
+        lang: localStorage.getItem('language') || 'uz',
+        translations: translations, // Tarjimalarni bu yerga qo'shamiz!
+
+        init() {
+            this.apply();
+        },
+
+        apply() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[this.lang] && translations[this.lang][key]) {
+                    // Agar element input yoki placeholder bo'lsa
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translations[this.lang][key];
+                    } else {
+                        el.textContent = translations[this.lang][key];
+                    }
+                }
+            });
+            // HTML lang atributini ham yangilaymiz
+            document.documentElement.lang = this.lang;
+        },
+
+        setLang(newLang) {
+            this.lang = newLang;
+            localStorage.setItem('language', newLang);
+            this.apply();
+
+            window.dispatchEvent(new CustomEvent('languageChanged', { detail: newLang }));
+            // Ba'zi hollarda sahifani yangilash kerak bo'lishi mumkin
+            // window.location.reload(); 
+        },
+
+        getCategoryName(name) {
+            const translations = {
+                "Oziq-ovqat": { uz: "Oziq-ovqat", ru: "Продукты", en: "Food" },
+                "Transport": { uz: "Transport", ru: "Транспорт", en: "Transport" },
+                "Ko'ngilochar": { uz: "Ko'ngilochar", ru: "Развлечения", en: "Entertainment" },
+                "Boshqa": { uz: "Boshqa", ru: "Прочее", en: "Other" },
+                "Ijara": { uz: "Ijara", ru: "Аренда", en: "Rent" },
+                "Kiyim": { uz: "Kiyim", ru: "Одежда", en: "Clothes" },
+                "Maishiy texnika": { uz: "Maishiy texnika", ru: "Бытовая техника", en: "Appliances" },
+                "Maosh": { uz: "Maosh", ru: "Зарплата", en: "Salary" },
+                "Sog'liq": { uz: "Sog'liq", ru: "Здоровье", en: "Health" },
+                "To'lovlar": { uz: "To'lovlar", ru: "Платежи", en: "Payments" },
+                "Uzatma": { uz: "Uzatma", ru: "Перевод", en: "Transfer" }
+            };
+
+            if (translations[name]) {
+                return translations[name][this.lang] || name;
+            }
+            return name;
+        }
+    };
+
+    // Tarjimalarni ishga tushirish
+    i18n.init();
+
+    // Global oyna (window) ob'ektiga qo'shamiz, boshqa JS fayllardan ham foydalanish uchun
+    window.i18n = i18n;
+
+    // --- Custom Language Dropdown Logic ---
+    const langDropdown = document.getElementById('lang-dropdown');
+    const selectedLangText = document.getElementById('selected-lang');
+    const langOptions = document.querySelectorAll('.lang-options li');
+
+    if (langDropdown && selectedLangText) {
+        // Hozirgi tilni ko'rsatish
+        selectedLangText.textContent = i18n.lang.toUpperCase();
+
+        // Dropdownni ochish/yopish
+        langDropdown.addEventListener('click', () => {
+            langDropdown.classList.toggle('active');
+        });
+
+        // Tilni tanlash
+        langOptions.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                const newLang = opt.getAttribute('data-value');
+                selectedLangText.textContent = newLang.toUpperCase();
+                i18n.setLang(newLang);
+                langDropdown.classList.remove('active');
+                e.stopPropagation(); // Dropdown yopilishi uchun
+            });
+        });
+
+        // Tashqariga bosilganda yopish
+        document.addEventListener('click', (e) => {
+            if (!langDropdown.contains(e.target)) {
+                langDropdown.classList.remove('active');
+            }
+        });
+    }
 
     loadAvatarForWholeApp();
-    
+
     // --- ROUTE GUARD ---
     const publicPages = ['/', '/index.html', '/login.html', '/register.html', '/forgot-password.html', '/reset-password.html'];
     const currentPage = window.location.pathname;

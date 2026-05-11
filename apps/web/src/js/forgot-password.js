@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 document.getElementById('forgot-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -14,7 +14,8 @@ document.getElementById('forgot-form').addEventListener('submit', async (e) => {
         const res = await fetch(`${API_URL}/auth/forget-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email }),
+            credentials: 'include'
         });
 
         const data = await res.json();

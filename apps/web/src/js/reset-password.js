@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 // URL dan tokenni olish
 const urlParams = new URLSearchParams(window.location.search);
@@ -30,7 +30,8 @@ document.getElementById('reset-form').addEventListener('submit', async (e) => {
         const res = await fetch(`${API_URL}/auth/reset-password/${token}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ newPassword })
+            body: JSON.stringify({ newPassword }),
+            credentials: 'include'
         });
 
         const data = await res.json();

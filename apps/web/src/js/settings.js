@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 let tempAvatarData = null;
 let tempAvatarName = null;
@@ -6,12 +6,7 @@ let savedAvatarData = null;
 let avatarRemoved = false;
 
 function getUserIdFromToken() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return null;
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id;
-    } catch (e) { return null; }
+    return localStorage.getItem('userId');
 }
 
 const initAvatarControls = () => {
@@ -39,11 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadUserData() {
-    const token = localStorage.getItem('accessToken');
     const currentLang = localStorage.getItem('language') || 'uz';
     try {
         const res = await fetch(`${API_URL}/users/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         const response = await res.json();
         const user = response.data;
@@ -162,10 +156,9 @@ function updatePageAvatar(imageData) {
 let currentBudgetId = null;
 
 async function loadBudgetData() {
-    const token = localStorage.getItem('accessToken');
     try {
         const res = await fetch(`${API_URL}/budgets`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         const response = await res.json();
         const budgets = response.data || [];
@@ -186,7 +179,6 @@ async function loadBudgetData() {
 
 async function updateProfile(e) {
     e.preventDefault();
-    const token = localStorage.getItem('accessToken');
     const name = document.getElementById('settings-name').value;
     const email = document.getElementById('settings-email').value;
     const currentLang = localStorage.getItem('language') || 'uz';
@@ -194,7 +186,8 @@ async function updateProfile(e) {
     try {
         const res = await fetch(`${API_URL}/users/me`, {
             method: 'PATCH',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ name, email })
         });
 
@@ -236,7 +229,6 @@ async function applyAvatarChanges() {
 
 async function updateBudget(e) {
     e.preventDefault();
-    const token = localStorage.getItem('accessToken');
     const totalBudget = Number(document.getElementById('settings-budget').value);
     const currentLang = localStorage.getItem('language') || 'uz';
 
@@ -249,13 +241,15 @@ async function updateBudget(e) {
         if (currentBudgetId) {
             res = await fetch(`${API_URL}/budgets/${currentBudgetId}`, {
                 method: 'PATCH',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ totalBudget })
             });
         } else {
             res = await fetch(`${API_URL}/budgets`, {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ month, year, totalBudget })
             });
         }
@@ -273,7 +267,6 @@ async function updateBudget(e) {
 
 async function updatePassword(e) {
     e.preventDefault();
-    const token = localStorage.getItem('accessToken');
     const password = document.getElementById('settings-password').value;
     const currentLang = localStorage.getItem('language') || 'uz';
 
@@ -285,7 +278,8 @@ async function updatePassword(e) {
     try {
         const res = await fetch(`${API_URL}/users/me`, {
             method: 'PATCH',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ password })
         });
 
@@ -301,14 +295,10 @@ async function updatePassword(e) {
 }
 
 export function loadAvatarForWholeApp() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const userId = payload.id;
-        const avatar = localStorage.getItem(`profileImage_${userId}`);
-        updatePageAvatar(avatar);
-    } catch (e) {}
+    const userId = getUserIdFromToken();
+    if (!userId) return;
+    const avatar = localStorage.getItem(`profileImage_${userId}`);
+    updatePageAvatar(avatar);
 }
 
 window.addEventListener('languageChanged', () => {

@@ -1,5 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
-const token = localStorage.getItem('accessToken');
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Global Chart ob'ektlari
 let expenseChartObj = null;
@@ -23,7 +22,8 @@ const initDashboardThemeObserver = () => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     initDashboardThemeObserver();
-    if (!token) {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (!isLoggedIn) {
         window.location.href = '/login.html';
         return;
     }
@@ -54,7 +54,7 @@ async function setupDashboard() {
     // 2. Kategoriyalarni yuklash
     try {
         const catRes = await fetch(`${API_URL}/categories`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         const catData = await catRes.json();
         if (catData.data) {
@@ -128,7 +128,7 @@ async function setupDashboard() {
     try {
         // 4. Foydalanuvchi ismini yuklash
         const userRes = await fetch(`${API_URL}/users/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         const userData = await userRes.json();
         if (userData.data) {
@@ -138,7 +138,7 @@ async function setupDashboard() {
 
         // 2. Hisob va Kategoriyalarni tekshirish (faqat birinchi marta kirgan bo'lsa)
         const accountsRes = await fetch(`${API_URL}/accounts`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         const accountsData = await accountsRes.json();
         if (accountsData.data && accountsData.data.length > 0) {
@@ -174,8 +174,8 @@ function updateWelcomeMessage() {
 async function loadDashboardData() {
     try {
         const [transRes, budgetRes] = await Promise.all([
-            fetch(`${API_URL}/transactions`, { headers: { 'Authorization': `Bearer ${token}` } }),
-            fetch(`${API_URL}/budgets`, { headers: { 'Authorization': `Bearer ${token}` } })
+            fetch(`${API_URL}/transactions`, { credentials: 'include' }),
+            fetch(`${API_URL}/budgets`, { credentials: 'include' })
         ]);
 
         const transData = await transRes.json();

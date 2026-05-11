@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 let storedTransactions = [];
 let dailyChart = null;
@@ -22,12 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadReportsData() {
-    const token = localStorage.getItem('accessToken');
     const currentLang = localStorage.getItem('language') || 'uz';
 
     try {
         const res = await fetch(`${API_URL}/transactions`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         const response = await res.json();
         const transactions = response.data || [];

@@ -1,8 +1,8 @@
-const API_URL = 'http://localhost:3000/api';
-const token = localStorage.getItem('accessToken');
+const API_URL = import.meta.env.VITE_API_URL;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!token) {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (!isLoggedIn) {
         window.location.href = '/login.html';
         return;
     }
@@ -18,7 +18,7 @@ async function loadCategories() {
 
     try {
         const res = await fetch(`${API_URL}/categories`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         const result = await res.json();
         const categories = result.data || [];
@@ -126,7 +126,7 @@ function setupCategoryModal() {
 
         try {
             if (parentName) {
-                const res = await fetch(`${API_URL}/categories`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`${API_URL}/categories`, { credentials: 'include' });
                 const result = await res.json();
                 const categories = result.data || [];
                 const existingParent = categories.find(c => (c.name.toLowerCase() === parentName.toLowerCase() || window.i18n.getCategoryName(c.name).toLowerCase() === parentName.toLowerCase()) && !c.parentId);
@@ -136,7 +136,8 @@ function setupCategoryModal() {
                 } else {
                     const newParentRes = await fetch(`${API_URL}/categories`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
                         body: JSON.stringify({ name: parentName, icon: '📁', type: type })
                     });
                     const newParentData = await newParentRes.json();
@@ -147,7 +148,8 @@ function setupCategoryModal() {
 
             const res = await fetch(`${API_URL}/categories`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ name, icon, type, parentId })
             });
 
@@ -172,7 +174,7 @@ async function deleteCategory(id) {
     try {
         const res = await fetch(`${API_URL}/categories/${id}`, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         if (res.ok) {
             await loadCategories();

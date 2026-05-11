@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadCategories();
@@ -9,13 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadCategories() {
-    const token = localStorage.getItem('accessToken');
     const select = document.getElementById('filter-category');
     const currentLang = localStorage.getItem('language') || 'uz';
 
     try {
         const res = await fetch(`${API_URL}/categories`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         const response = await res.json();
         const categories = response.data || [];
@@ -37,7 +36,6 @@ async function loadCategories() {
 }
 
 async function loadExpenses() {
-    const token = localStorage.getItem('accessToken');
     const tbody = document.getElementById('expenses-tbody');
     const currentLang = localStorage.getItem('language') || 'uz';
     const langMap = { 'uz': 'uz-UZ', 'ru': 'ru-RU', 'en': 'en-US' };
@@ -48,7 +46,7 @@ async function loadExpenses() {
 
     try {
         const res = await fetch(`${API_URL}/transactions`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         const response = await res.json();
         let transactions = response.data || [];
@@ -128,12 +126,10 @@ function resetFilters() {
 window.deleteTransaction = async (id) => {
     const currentLang = localStorage.getItem('language') || 'uz';
     if (!confirm(window.i18n.translations[currentLang].delete_confirm)) return;
-
-    const token = localStorage.getItem('accessToken');
     try {
         const res = await fetch(`${API_URL}/transactions/${id}`, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
 
         if (res.ok) {

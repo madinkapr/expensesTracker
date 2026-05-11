@@ -76,29 +76,42 @@ class authController {
             });
 
             // 5. Javob qaytarish (javobga refreshToken ni ham qo'shib yuboramiz)
+            // Cookie-larga yozish
+            res.cookie('accessToken', token, {
+                httpOnly: true,
+                secure: false, // Prod-da true bo'ladi
+                sameSite: 'lax',
+                maxAge: 24 * 60 * 60 * 1000 // 1 kun
+            });
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 kun
+            });
             return successRes(res, {
-                token,
-                refreshToken,
                 user: { id: user._id, name: user.name, email: user.email }
             });
         } catch (error) {
-            return errorRes(res, error)
+            return errorRes(res, error);
         }
     }
-
     async logout(req, res) {
         try {
-            const { refreshToken } = req.body;
+            const { refreshToken } = req.cookies;
 
             if (!refreshToken) {
                 return errorRes(res, { statusCode: 400, message: "Refresh token is required" });
             }
 
-            const deleteSession = await Session.findOneAndDelete({ refreshToken });
-
-            if (!deleteSession) {
-                return errorRes(res, { statusCode: 404, message: "Session not found" });
+            if (refreshToken) {
+                await Session.findOneAndDelete({ refreshToken });
             }
+
+            // Cookie ni o'chirish (browserdan)}
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
+
             return successRes(res, { message: "Logged out successfully" });
         } catch (error) {
             return errorRes(res, error);

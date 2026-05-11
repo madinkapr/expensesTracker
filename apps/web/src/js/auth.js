@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const registerForm = document.getElementById('register-form');
 const loginForm = document.getElementById('login-form');
@@ -23,7 +23,8 @@ if (registerForm) {
       const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password }),
+        credentials: 'include'
       });
 
       const response = await res.json();
@@ -59,16 +60,15 @@ if (loginForm) {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        credentials: 'include'
       });
 
       const response = await res.json();
       if (!res.ok) throw new Error(response.message || t.error_login);
 
-      const data = response.data;
-      localStorage.setItem('accessToken', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
-
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userId', response.data.user.id);
       alert(t.alert_login_success);
       window.location.href = '/dashboard.html';
     } catch (err) {

@@ -3,6 +3,8 @@ import './auth.js'
 import { loadAvatarForWholeApp } from './settings.js';
 import { translations } from './translations.js';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // Dark mode sahifa yuklangunga qadar ham ishlashi uchun
 // (fon o'zgarmasligi uchun)
 const savedTheme = localStorage.getItem('theme');
@@ -113,13 +115,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ROUTE GUARD ---
     const publicPages = ['/', '/index.html', '/login.html', '/register.html', '/forgot-password.html', '/reset-password.html'];
     const currentPage = window.location.pathname;
-    const token = localStorage.getItem('accessToken');
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
-    if (!token && !publicPages.includes(currentPage) && currentPage !== '/') {
+    if (!isLoggedIn && !publicPages.includes(currentPage) && currentPage !== '/') {
         window.location.href = '/login.html';
         return;
     }
-    if (token && (currentPage === '/login.html' || currentPage === '/register.html')) {
+    if (isLoggedIn && (currentPage === '/login.html' || currentPage === '/register.html')) {
         window.location.href = '/dashboard.html';
         return;
     }
@@ -127,9 +129,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LOGOUT ---
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await fetch(`${API_URL}/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+
+            localStorage.removeItem('profileImage')
+            localStorage.removeItem('isLoggedIn');
             window.location.href = '/login.html';
         });
     }

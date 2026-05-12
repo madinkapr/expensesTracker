@@ -351,17 +351,18 @@ function renderWeeklyChart(transactions) {
     if (!ctx) return;
 
     const last7Days = [];
+    const dailyTotals = {};
+
     for (let i = 6; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
-        last7Days.push(d.toISOString().split('T')[0]);
+        const localDate = d.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+        last7Days.push(localDate);
+        dailyTotals[localDate] = 0;
     }
 
-    const dailyTotals = {};
-    last7Days.forEach(date => dailyTotals[date] = 0);
-
     transactions.forEach(t => {
-        const tDate = new Date(t.date).toISOString().split('T')[0];
+        const tDate = new Date(t.date).toLocaleDateString('en-CA');
         if (dailyTotals.hasOwnProperty(tDate)) {
             dailyTotals[tDate] += t.amount;
         }
